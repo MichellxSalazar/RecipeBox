@@ -3,7 +3,11 @@ package com.example.recipebox.ui.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -22,6 +26,11 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("RecipeBox") })
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { navController.navigate("add_recipe") }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Recipe")
+            }
         }
     ) { padding ->
         Column(
@@ -32,7 +41,6 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
             if (recipes.isEmpty()) {
                 Text(text = "No recipes found. Start adding some!")
             } else {
-                // List of recipes will go here
                 Text(text = "You have ${recipes.size} recipes.")
             }
         }
