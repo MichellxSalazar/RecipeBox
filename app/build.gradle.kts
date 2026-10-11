@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.kotlin.plugin.parcelize")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -54,8 +55,7 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    // Add KSP plugin to use room-compiler in Kotlin
-    // ksp(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     
     // Navigation Compose
     implementation(libs.androidx.navigation.compose)
