@@ -8,7 +8,7 @@ import com.example.recipebox.data.local.dao.RecipeDao
 import com.example.recipebox.data.local.entity.CategoryEntity
 import com.example.recipebox.data.local.entity.RecipeEntity
 
-@Database(entities = [RecipeEntity::class, CategoryEntity::class], version = 1, exportSchema = false)
+@Database(entities = [RecipeEntity::class, CategoryEntity::class], version = 1, exportSchema = true)
 abstract class RecipeDatabase : RoomDatabase() {
 
     abstract fun recipeDao(): RecipeDao

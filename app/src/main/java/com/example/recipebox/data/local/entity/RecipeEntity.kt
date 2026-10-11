@@ -1,9 +1,20 @@
 package com.example.recipebox.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "recipes")
+@Entity(
+    tableName = "recipes",
+    foreignKeys = [
+        ForeignKey(
+            entity = CategoryEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["categoryId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
 data class RecipeEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
