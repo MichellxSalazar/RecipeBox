@@ -3,6 +3,8 @@ package com.example.recipebox.ui.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,7 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.recipebox.ui.components.RecipeCard
 import com.example.recipebox.ui.viewmodels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,9 +43,21 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
                 .padding(padding)
         ) {
             if (recipes.isEmpty()) {
-                Text(text = "No recipes found. Start adding some!")
+                Text(
+                    text = "No recipes found. Start adding some!",
+                    modifier = Modifier.padding(16.dp)
+                )
             } else {
-                Text(text = "You have ${recipes.size} recipes.")
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(recipes) { recipe ->
+                        RecipeCard(
+                            recipe = recipe,
+                            onClick = { /* TODO: Navegar a detalles */ }
+                        )
+                    }
+                }
             }
         }
     }
