@@ -382,6 +382,7 @@ private fun HomeContent(
     showBackground = true,
     showSystemUi = true
 )
+
 @Composable
 fun RecipeListPreview() {
 
@@ -398,7 +399,7 @@ fun RecipeListPreview() {
         RecipeEntity(
             id = 2,
             name = "Ensalada de atún",
-            categoryId = 1,
+            categoryId = 2,
             ingredients = "Atún y vegetales",
             instructions = "Mezclar ingredientes",
             prepTimeMinutes = 15,
@@ -407,7 +408,7 @@ fun RecipeListPreview() {
         RecipeEntity(
             id = 3,
             name = "Pasta con queso",
-            categoryId = 1,
+            categoryId = 3,
             ingredients = "Pasta y queso",
             instructions = "Cocinar la pasta",
             prepTimeMinutes = 25,
