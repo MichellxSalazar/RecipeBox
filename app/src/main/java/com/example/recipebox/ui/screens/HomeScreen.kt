@@ -467,3 +467,34 @@ fun EmptySearchState(
         }
     }
 }
+
+
+@Composable
+fun LoadingRecipesState() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 48.dp, horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        CircularProgressIndicator(
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Text(
+            text = "Cargando tus recetas...",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoadingRecipesStatePreview() {
+    MaterialTheme {
+        LoadingRecipesState()
+    }
+}
