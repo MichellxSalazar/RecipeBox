@@ -24,6 +24,18 @@ class MainViewModel(private val repository: RecipeRepository) : ViewModel() {
             repository.insertRecipe(recipe)
         }
     }
+
+    fun updateRecipe(recipe: RecipeEntity) {
+        viewModelScope.launch {
+            repository.updateRecipe(recipe)
+        }
+    }
+
+    fun deleteRecipe(recipe: RecipeEntity) {
+        viewModelScope.launch {
+            repository.deleteRecipe(recipe)
+        }
+    }
 }
 
 class MainViewModelFactory(private val repository: RecipeRepository) : ViewModelProvider.Factory {

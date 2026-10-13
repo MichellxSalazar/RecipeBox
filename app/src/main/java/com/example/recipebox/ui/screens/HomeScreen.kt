@@ -54,7 +54,7 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
                     items(recipes) { recipe ->
                         RecipeCard(
                             recipe = recipe,
-                            onClick = { /* TODO: Navegar a detalles */ }
+                            onClick = { navController.navigate("recipe_detail/${recipe.id}") }
                         )
                     }
                 }
