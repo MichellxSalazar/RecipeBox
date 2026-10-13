@@ -1,6 +1,7 @@
 
 package com.example.recipebox.ui.screens
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -57,6 +58,10 @@ private fun HomeContent(
         mutableStateOf(false)
     }
 
+    var selectedCategoryId by rememberSaveable {
+        mutableIntStateOf(0)
+    }
+
     var selectedOrder by rememberSaveable {
         mutableStateOf("default")
     }
@@ -78,8 +83,14 @@ private fun HomeContent(
             val matchesFavorites =
                 !onlyFavorites || recipe.isFavorite
 
-            matchesSearch && matchesFavorites
+            val matchesCategory =
+                selectedCategoryId == 0 ||
+                        recipe.categoryId == selectedCategoryId
+
+            matchesSearch && matchesFavorites && matchesCategory
         }
+
+
         .let { filtered ->
 
             when (selectedOrder) {
@@ -189,6 +200,44 @@ private fun HomeContent(
                     onClick = { onlyFavorites = true },
                     label = { Text("♥ Favoritas") }
                 )
+            }
+
+            val categoryIds = recipes
+                .map { it.categoryId }
+                .distinct()
+                .sorted()
+
+            Text(
+                text = "Categorías",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(
+                        androidx.compose.foundation.rememberScrollState()
+                    ),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = selectedCategoryId == 0,
+                    onClick = { selectedCategoryId = 0 },
+                    label = { Text("Todas") }
+                )
+
+                categoryIds.forEach { categoryId ->
+                    FilterChip(
+                        selected = selectedCategoryId == categoryId,
+                        onClick = {
+                            selectedCategoryId = categoryId
+                        },
+                        label = {
+                            Text("Categoría $categoryId")
+                        }
+                    )
+                }
             }
 
             Box {
