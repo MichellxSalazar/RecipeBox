@@ -57,19 +57,52 @@ private fun HomeContent(
         mutableStateOf(false)
     }
 
-
-
-    val filteredRecipes = recipes.filter { recipe ->
-        val matchesSearch = recipe.name.contains(
-            searchText,
-            ignoreCase = true
-        )
-
-        val matchesFavorites =
-            !onlyFavorites || recipe.isFavorite
-
-        matchesSearch && matchesFavorites
+    var selectedOrder by rememberSaveable {
+        mutableStateOf("default")
     }
+
+    var showOrderMenu by remember {
+        mutableStateOf(false)
+    }
+
+
+
+    val filteredRecipes = recipes
+        .filter { recipe ->
+
+            val matchesSearch = recipe.name.contains(
+                searchText,
+                ignoreCase = true
+            )
+
+            val matchesFavorites =
+                !onlyFavorites || recipe.isFavorite
+
+            matchesSearch && matchesFavorites
+        }
+        .let { filtered ->
+
+            when (selectedOrder) {
+
+                "az" -> filtered.sortedBy {
+                    it.name.lowercase()
+                }
+
+                "za" -> filtered.sortedByDescending {
+                    it.name.lowercase()
+                }
+
+                "fast" -> filtered.sortedBy {
+                    it.prepTimeMinutes
+                }
+
+                "slow" -> filtered.sortedByDescending {
+                    it.prepTimeMinutes
+                }
+
+                else -> filtered
+            }
+        }
 
     Scaffold(
         topBar = {
@@ -156,6 +189,69 @@ private fun HomeContent(
                     onClick = { onlyFavorites = true },
                     label = { Text("♥ Favoritas") }
                 )
+            }
+
+            Box {
+
+                OutlinedButton(
+                    onClick = {
+                        showOrderMenu = true
+                    },
+                    contentPadding = PaddingValues(
+                        horizontal = 12.dp,
+                        vertical = 8.dp
+                    )
+                ) {
+                    Text("Ordenar")
+                }
+
+                DropdownMenu(
+                    expanded = showOrderMenu,
+                    onDismissRequest = {
+                        showOrderMenu = false
+                    }
+                ) {
+
+                    DropdownMenuItem(
+                        text = { Text("Orden original") },
+                        onClick = {
+                            selectedOrder = "default"
+                            showOrderMenu = false
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text("Nombre (A-Z)") },
+                        onClick = {
+                            selectedOrder = "az"
+                            showOrderMenu = false
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text("Nombre (Z-A)") },
+                        onClick = {
+                            selectedOrder = "za"
+                            showOrderMenu = false
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text("Menor tiempo") },
+                        onClick = {
+                            selectedOrder = "fast"
+                            showOrderMenu = false
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text("Mayor tiempo") },
+                        onClick = {
+                            selectedOrder = "slow"
+                            showOrderMenu = false
+                        }
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
