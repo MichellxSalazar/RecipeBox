@@ -49,8 +49,23 @@ private fun HomeContent(
         mutableStateOf("")
     }
 
-    val filteredRecipes = recipes.filter {
-        it.name.contains(searchText, ignoreCase = true)
+
+    var onlyFavorites by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+
+
+    val filteredRecipes = recipes.filter { recipe ->
+        val matchesSearch = recipe.name.contains(
+            searchText,
+            ignoreCase = true
+        )
+
+        val matchesFavorites =
+            !onlyFavorites || recipe.isFavorite
+
+        matchesSearch && matchesFavorites
     }
 
     Scaffold(
@@ -122,12 +137,37 @@ private fun HomeContent(
 
             Spacer(modifier = Modifier.height(20.dp))
 
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                FilterChip(
+                    selected = !onlyFavorites,
+                    onClick = { onlyFavorites = false },
+                    label = { Text("Todas") }
+                )
+
+                FilterChip(
+                    selected = onlyFavorites,
+                    onClick = { onlyFavorites = true },
+                    label = { Text("♥ Favoritas") }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Todas las recetas",
+                    text = if (onlyFavorites) {
+                        "Mis favoritas"
+                    } else {
+                        "Todas las recetas"
+                    },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
