@@ -491,10 +491,24 @@ fun LoadingRecipesState() {
     }
 }
 
-@Preview(showBackground = true)
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
 @Composable
 private fun LoadingRecipesStatePreview() {
     MaterialTheme {
-        LoadingRecipesState()
+        Surface(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingRecipesState()
+            }
+        }
     }
 }
+
