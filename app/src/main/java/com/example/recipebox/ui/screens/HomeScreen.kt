@@ -7,13 +7,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipebox.data.local.entity.RecipeEntity
 import com.example.recipebox.ui.home.components.RecipeCard
@@ -182,15 +185,29 @@ private fun HomeContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             if (filteredRecipes.isEmpty()) {
-                Text(
-                    text = if (searchText.isBlank()) {
-                        "No tienes recetas guardadas. ¡Agrega una!"
-                    } else {
-                        "No se encontraron recetas."
-                    },
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 20.dp)
-                )
+
+                if (recipes.isEmpty()) {
+
+                    EmptySearchState(
+                        title = "Todavía no tienes recetas",
+                        message = "Comienza agregando tu primera receta.",
+                        buttonText = "Agregar receta",
+                        onAction = onAddRecipe
+                    )
+
+                } else {
+
+                    EmptySearchState(
+                        title = "No encontramos recetas",
+                        message = "Intenta buscar con otro nombre o limpia los filtros.",
+                        buttonText = "Limpiar búsqueda",
+                        onAction = {
+                            searchText = ""
+                            onlyFavorites = false
+                        }
+                    )
+                }
+
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -259,5 +276,48 @@ fun RecipeListPreview() {
             onAddRecipe = {},
             onRecipeClick = {}
         )
+    }
+}
+
+@Composable
+fun EmptySearchState(
+    title: String,
+    message: String,
+    buttonText: String,
+    onAction: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 40.dp, horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.SearchOff,
+            contentDescription = null,
+            modifier = Modifier.size(52.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+
+        OutlinedButton(
+            onClick = onAction
+        ) {
+            Text(buttonText)
+        }
     }
 }
