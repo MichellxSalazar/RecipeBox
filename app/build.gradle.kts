@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.kotlin.plugin.parcelize")
-    alias(libs.plugins.kotlin.serialization) // <- Habilita la serialización para rutas tipadas
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -31,10 +31,12 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
         compose = true
     }
@@ -43,6 +45,7 @@ android {
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
+
     // UI and Material Icons
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.material:material-icons-extended")
@@ -50,17 +53,19 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
+
+    // Lifecycle
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    // Add KSP plugin to use room-compiler in Kotlin
     // ksp(libs.androidx.room.compiler)
 
     // Navigation Compose & Serialization
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.kotlinx.serialization.json) // <- Librería JSON para las rutas
+    implementation(libs.kotlinx.serialization.json)
 
     // DataStore Preferences
     implementation(libs.androidx.datastore.preferences)
@@ -68,11 +73,14 @@ dependencies {
     // ViewModel Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+    // Tests
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+
+    // Debug
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
