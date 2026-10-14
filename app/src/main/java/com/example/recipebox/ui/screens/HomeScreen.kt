@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.example.recipebox.data.local.entity.RecipeEntity
 import com.example.recipebox.ui.home.components.RecipeCard
 import com.example.recipebox.ui.viewmodels.MainViewModel
+import androidx.compose.material.icons.filled.Close
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -164,6 +165,7 @@ private fun HomeContent(
 
             Spacer(modifier = Modifier.height(20.dp))
 
+
             OutlinedTextField(
                 value = searchText,
                 onValueChange = { searchText = it },
@@ -177,10 +179,24 @@ private fun HomeContent(
                         contentDescription = "Buscar"
                     )
                 },
+                trailingIcon = {
+                    if (searchText.isNotEmpty()) {
+                        IconButton(
+                            onClick = {
+                                searchText = ""
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Limpiar búsqueda"
+                            )
+                        }
+                    }
+                },
                 singleLine = true,
-                shape = androidx.compose.foundation.shape
-                    .RoundedCornerShape(16.dp)
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
             )
+
 
             Spacer(modifier = Modifier.height(20.dp))
 
