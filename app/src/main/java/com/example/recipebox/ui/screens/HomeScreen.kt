@@ -25,6 +25,7 @@ import com.example.recipebox.ui.viewmodels.MainViewModel
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import com.example.recipebox.ui.home.HomeUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -530,4 +531,78 @@ private fun LoadingRecipesStatePreview() {
         }
     }
 }
+
+
+@Composable
+private fun HomeStateContent(
+    uiState: HomeUiState,
+    onAddRecipe: () -> Unit,
+    onRecipeClick: (RecipeEntity) -> Unit
+) {
+    when (uiState) {
+        is HomeUiState.Loading -> {
+            LoadingRecipesState()
+        }
+
+        is HomeUiState.Success -> {
+            HomeContent(
+                recipes = uiState.recipes,
+                onAddRecipe = onAddRecipe,
+                onRecipeClick = onRecipeClick
+            )
+        }
+
+        is HomeUiState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = uiState.message,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+    }
+}
+
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun HomeLoadingPreview() {
+    MaterialTheme {
+        HomeStateContent(
+            uiState = HomeUiState.Loading,
+            onAddRecipe = {},
+            onRecipeClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun HomeEmptyPreview() {
+    MaterialTheme {
+        HomeStateContent(
+            uiState = HomeUiState.Success(emptyList()),
+            onAddRecipe = {},
+            onRecipeClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun HomeErrorPreview() {
+    MaterialTheme {
+        HomeStateContent(
+            uiState = HomeUiState.Error(
+                "No se pudieron cargar las recetas"
+            ),
+            onAddRecipe = {},
+            onRecipeClick = {}
+        )
+    }
+}
+
 
