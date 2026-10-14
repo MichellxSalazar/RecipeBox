@@ -23,6 +23,8 @@ import com.example.recipebox.data.local.entity.RecipeEntity
 import com.example.recipebox.ui.home.components.RecipeCard
 import com.example.recipebox.ui.viewmodels.MainViewModel
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -201,23 +203,6 @@ private fun HomeContent(
             Spacer(modifier = Modifier.height(20.dp))
 
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                FilterChip(
-                    selected = !onlyFavorites,
-                    onClick = { onlyFavorites = false },
-                    label = { Text("Todas") }
-                )
-
-                FilterChip(
-                    selected = onlyFavorites,
-                    onClick = { onlyFavorites = true },
-                    label = { Text("♥ Favoritas") }
-                )
-            }
-
             val categoryIds = recipes
                 .map { it.categoryId }
                 .distinct()
@@ -256,68 +241,86 @@ private fun HomeContent(
                 }
             }
 
-            Box {
 
-                OutlinedButton(
-                    onClick = {
-                        showOrderMenu = true
-                    },
-                    contentPadding = PaddingValues(
-                        horizontal = 12.dp,
-                        vertical = 8.dp
-                    )
-                ) {
-                    Text("Ordenar")
-                }
 
-                DropdownMenu(
-                    expanded = showOrderMenu,
-                    onDismissRequest = {
-                        showOrderMenu = false
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FilterChip(
+                    selected = !onlyFavorites,
+                    onClick = { onlyFavorites = false },
+                    label = { Text("Todas") }
+                )
+
+                FilterChip(
+                    selected = onlyFavorites,
+                    onClick = { onlyFavorites = true },
+                    label = { Text("♥ Favoritas") }
+                )
+
+                Box {
+                    OutlinedButton(
+                        onClick = { showOrderMenu = true },
+                        contentPadding = PaddingValues(
+                            horizontal = 12.dp,
+                            vertical = 8.dp
+                        )
+                    ) {
+                        Text("Ordenar")
                     }
-                ) {
 
-                    DropdownMenuItem(
-                        text = { Text("Orden original") },
-                        onClick = {
-                            selectedOrder = "default"
-                            showOrderMenu = false
-                        }
-                    )
+                    DropdownMenu(
+                        expanded = showOrderMenu,
+                        onDismissRequest = { showOrderMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Orden original") },
+                            onClick = {
+                                selectedOrder = "default"
+                                showOrderMenu = false
+                            }
+                        )
 
-                    DropdownMenuItem(
-                        text = { Text("Nombre (A-Z)") },
-                        onClick = {
-                            selectedOrder = "az"
-                            showOrderMenu = false
-                        }
-                    )
+                        DropdownMenuItem(
+                            text = { Text("Nombre (A-Z)") },
+                            onClick = {
+                                selectedOrder = "az"
+                                showOrderMenu = false
+                            }
+                        )
 
-                    DropdownMenuItem(
-                        text = { Text("Nombre (Z-A)") },
-                        onClick = {
-                            selectedOrder = "za"
-                            showOrderMenu = false
-                        }
-                    )
+                        DropdownMenuItem(
+                            text = { Text("Nombre (Z-A)") },
+                            onClick = {
+                                selectedOrder = "za"
+                                showOrderMenu = false
+                            }
+                        )
 
-                    DropdownMenuItem(
-                        text = { Text("Menor tiempo") },
-                        onClick = {
-                            selectedOrder = "fast"
-                            showOrderMenu = false
-                        }
-                    )
+                        DropdownMenuItem(
+                            text = { Text("Menor tiempo") },
+                            onClick = {
+                                selectedOrder = "fast"
+                                showOrderMenu = false
+                            }
+                        )
 
-                    DropdownMenuItem(
-                        text = { Text("Mayor tiempo") },
-                        onClick = {
-                            selectedOrder = "slow"
-                            showOrderMenu = false
-                        }
-                    )
+                        DropdownMenuItem(
+                            text = { Text("Mayor tiempo") },
+                            onClick = {
+                                selectedOrder = "slow"
+                                showOrderMenu = false
+                            }
+                        )
+                    }
                 }
             }
+
+
 
             Spacer(modifier = Modifier.height(12.dp))
 
