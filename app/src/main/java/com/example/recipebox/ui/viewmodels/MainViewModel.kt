@@ -14,6 +14,23 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: RecipeRepository) : ViewModel() {
 
+    init {
+        // Pre-populate database with default categories to avoid Foreign Key constraint failures
+        // until Modulo-Categorias implements full category management.
+        viewModelScope.launch {
+            if (repository.getCategoryCount() == 0) {
+                repository.insertCategories(
+                    listOf(
+                        CategoryEntity(id = 1, name = "Desayunos"),
+                        CategoryEntity(id = 2, name = "Almuerzos"),
+                        CategoryEntity(id = 3, name = "Cenas"),
+                        CategoryEntity(id = 4, name = "Postres")
+                    )
+                )
+            }
+        }
+    }
+
     val allRecipes: StateFlow<List<RecipeEntity>> = repository.getAllRecipes()
         .stateIn(
             scope = viewModelScope,
