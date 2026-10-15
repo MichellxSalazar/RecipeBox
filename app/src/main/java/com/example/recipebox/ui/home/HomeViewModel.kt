@@ -1,8 +1,10 @@
+
 package com.example.recipebox.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipebox.repository.RecipeRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,16 +21,23 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> =
         _uiState.asStateFlow()
 
+    private var loadJob: Job? = null
+
     init {
         loadRecipes()
     }
 
-    private fun loadRecipes() {
-        viewModelScope.launch {
+    fun loadRecipes() {
+        loadJob?.cancel()
+
+        _uiState.value = HomeUiState.Loading
+
+        loadJob = viewModelScope.launch {
             repository.getAllRecipes()
                 .catch { exception ->
                     _uiState.value = HomeUiState.Error(
-                        exception.message ?: "Error al cargar las recetas"
+                        exception.message
+                            ?: "No se pudieron cargar las recetas"
                     )
                 }
                 .collect { recipes ->
