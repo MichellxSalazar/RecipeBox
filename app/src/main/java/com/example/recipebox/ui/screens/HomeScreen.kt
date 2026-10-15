@@ -23,7 +23,6 @@ import com.example.recipebox.data.local.entity.RecipeEntity
 import com.example.recipebox.ui.home.components.RecipeCard
 import com.example.recipebox.ui.viewmodels.MainViewModel
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import com.example.recipebox.ui.home.HomeUiState
 import androidx.compose.ui.platform.LocalContext
@@ -163,6 +162,9 @@ private fun HomeContent(
                 value = searchText,
                 onValueChange = { searchText = it },
                 modifier = Modifier.fillMaxWidth(),
+                label = {
+                    Text("Buscar por nombre")
+                },
                 placeholder = {
                     Text("Buscar recetas...")
                 },
@@ -216,7 +218,7 @@ private fun HomeContent(
                 FilterChip(
                     selected = selectedCategoryId == 0,
                     onClick = { selectedCategoryId = 0 },
-                    label = { Text("Todas las recetas") }
+                    label = { Text("Todas") }
                 )
 
                 categoryIds.forEach { categoryId ->
@@ -244,7 +246,7 @@ private fun HomeContent(
                 FilterChip(
                     selected = !onlyFavorites,
                     onClick = { onlyFavorites = false },
-                    label = { Text("Todas") }
+                    label = { Text("Todas las recetas") }
                 )
 
                 FilterChip(
@@ -373,12 +375,15 @@ private fun HomeContent(
                     EmptySearchState(
                         title = "No encontramos recetas",
                         message = "Intenta buscar con otro nombre o limpia los filtros.",
-                        buttonText = "Limpiar búsqueda",
+                        buttonText = "Limpiar filtros",
                         onAction = {
                             searchText = ""
                             onlyFavorites = false
+                            selectedCategoryId = 0
+                            selectedOrder = "default"
                         }
                     )
+
                 }
 
             } else {

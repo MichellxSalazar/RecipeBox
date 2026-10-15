@@ -1,8 +1,6 @@
-
 package com.example.recipebox.ui.home.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,12 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.recipebox.data.local.entity.RecipeEntity
+import androidx.compose.material3.darkColorScheme
 
 @Composable
 fun RecipeCard(
@@ -27,9 +25,8 @@ fun RecipeCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -43,31 +40,27 @@ fun RecipeCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
-            // Imagen predeterminada representada por un icono
             Box(
                 modifier = Modifier
-                    .size(92.dp)
+                    .size(88.dp)
                     .background(
-                        color = Color(0xFFFFE8D6),
+                        color = MaterialTheme.colorScheme.primaryContainer,
                         shape = RoundedCornerShape(16.dp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Restaurant,
-                    contentDescription = "Icono de receta",
-                    tint = Color(0xFFE88748),
-                    modifier = Modifier.size(42.dp)
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(40.dp)
                 )
             }
 
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-
-                // Nombre de la receta
                 Text(
                     text = recipe.name,
                     style = MaterialTheme.typography.titleMedium,
@@ -76,7 +69,6 @@ fun RecipeCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                // Tiempo de preparación
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -95,24 +87,23 @@ fun RecipeCard(
                     )
                 }
 
-                // Indicador de receta favorita
                 if (recipe.isFavorite) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(5.dp)
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = null,
-                            tint = Color(0xFFE85D75),
+                            tint = MaterialTheme.colorScheme.tertiary,
                             modifier = Modifier.size(18.dp)
                         )
 
                         Text(
                             text = "Favorita",
-                            color = Color(0xFFE85D75),
                             style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
                 }
@@ -125,23 +116,53 @@ fun RecipeCard(
 @Composable
 fun RecipeCardPreview() {
     MaterialTheme {
-        Box(
-            modifier = Modifier
-                .background(Color(0xFFF7F5F2))
-                .padding(16.dp)
-        ) {
-            RecipeCard(
-                recipe = RecipeEntity(
-                    id = 1,
-                    name = "Arroz con pollo",
-                    categoryId = 1,
-                    ingredients = "Arroz y pollo",
-                    instructions = "Preparar el arroz",
-                    prepTimeMinutes = 40,
-                    isFavorite = true
-                ),
-                onClick = {}
-            )
+        Surface {
+            Box(modifier = Modifier.padding(16.dp)) {
+                RecipeCard(
+                    recipe = RecipeEntity(
+                        id = 1,
+                        name = "Arroz con pollo",
+                        categoryId = 1,
+                        ingredients = "Arroz y pollo",
+                        instructions = "Preparar el arroz",
+                        prepTimeMinutes = 40,
+                        isFavorite = true
+                    ),
+                    onClick = {}
+                )
+            }
+        }
+    }
+}
+
+
+@Preview(
+    name = "Tarjeta - Modo oscuro",
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun RecipeCardDarkPreview() {
+    MaterialTheme(
+        colorScheme = darkColorScheme()
+    ) {
+        Surface {
+            Box(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                RecipeCard(
+                    recipe = RecipeEntity(
+                        id = 1,
+                        name = "Arroz con pollo",
+                        categoryId = 1,
+                        ingredients = "Arroz y pollo",
+                        instructions = "Preparar el arroz",
+                        prepTimeMinutes = 40,
+                        isFavorite = true
+                    ),
+                    onClick = {}
+                )
+            }
         }
     }
 }
