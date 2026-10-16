@@ -1,9 +1,12 @@
+
 package com.example.recipebox.ui.configuracion
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipebox.data.preferences.UserPreferencesRepository
 import com.example.recipebox.domain.model.PreferenciasUsuario
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -11,7 +14,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ConfiguracionViewModel(
+@HiltViewModel
+class ConfiguracionViewModel @Inject constructor(
     private val repository: UserPreferencesRepository
 ) : ViewModel() {
 

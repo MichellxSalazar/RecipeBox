@@ -1,12 +1,18 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.kotlin.plugin.parcelize")
     alias(libs.plugins.kotlin.serialization)
+
+    // Inyección de dependencias
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
     namespace = "com.example.recipebox"
+
     compileSdk {
         version = release(37)
     }
@@ -18,13 +24,15 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner =
+            "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -43,10 +51,9 @@ android {
 }
 
 dependencies {
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
-
-    // UI and Material Icons
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.compose.ui)
@@ -61,9 +68,9 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    // ksp(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
 
-    // Navigation Compose & Serialization
+    // Navigation Compose y Serialization
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
@@ -72,6 +79,13 @@ dependencies {
 
     // ViewModel Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Hilt: inyección de dependencias
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+
+    // Hilt para Navigation Compose
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // Tests
     testImplementation(libs.junit)
