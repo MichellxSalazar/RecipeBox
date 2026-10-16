@@ -2,11 +2,14 @@
 package com.example.recipebox.ui.screens
 
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.*
@@ -18,41 +21,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.recipebox.data.local.entity.RecipeEntity
+import com.example.recipebox.ui.home.HomeUiState
+import com.example.recipebox.ui.home.HomeViewModel
+import com.example.recipebox.ui.home.RecipeFilter
 import com.example.recipebox.ui.home.components.RecipeCard
 import com.example.recipebox.ui.viewmodels.MainViewModel
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.foundation.rememberScrollState
-import com.example.recipebox.ui.home.HomeUiState
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.recipebox.data.local.RecipeDatabase
-import com.example.recipebox.repository.RecipeRepository
-import com.example.recipebox.ui.home.HomeViewModel
-import com.example.recipebox.ui.home.HomeViewModelFactory
-import com.example.recipebox.ui.home.RecipeFilter
 
-@OptIn(ExperimentalMaterial3Api::class)
+// =====================================================
+// PANTALLA PRINCIPAL - INTEGRACIÓN CON HILT
+// =====================================================
+
+@Suppress("UNUSED_PARAMETER")
 @Composable
 fun HomeScreen(
     navController: NavController,
     viewModel: MainViewModel
 ) {
-    val context = LocalContext.current.applicationContext
+    // Hilt proporciona automáticamente HomeViewModel.
+    val homeViewModel: HomeViewModel = hiltViewModel()
 
-    val repository = remember(context) {
-        val database = RecipeDatabase.getDatabase(context)
-        RecipeRepository(database.recipeDao())
-    }
-
-    val homeViewModel: HomeViewModel = viewModel(
-        factory = remember(repository) {
-            HomeViewModelFactory(repository)
-        }
-    )
-
-    val uiState by homeViewModel.uiState.collectAsState()
+    // Observamos StateFlow respetando el ciclo de vida.
+    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
     HomeStateContent(
         uiState = uiState,
@@ -60,7 +53,7 @@ fun HomeScreen(
             navController.navigate("add_recipe")
         },
         onRecipeClick = {
-            // Navegación al detalle pendiente de integración
+            // Pendiente de integración con el módulo de detalle.
         },
         onRetry = {
             homeViewModel.loadRecipes()
@@ -68,6 +61,9 @@ fun HomeScreen(
     )
 }
 
+// =====================================================
+// CONTENIDO DE INICIO
+// =====================================================
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,12 +71,10 @@ private fun HomeContent(
     recipes: List<RecipeEntity>,
     onAddRecipe: () -> Unit,
     onRecipeClick: (RecipeEntity) -> Unit
-
 ) {
     var searchText by rememberSaveable {
         mutableStateOf("")
     }
-
 
     var onlyFavorites by rememberSaveable {
         mutableStateOf(false)
@@ -98,8 +92,7 @@ private fun HomeContent(
         mutableStateOf(false)
     }
 
-
-
+    // Aplicamos la lógica de nuestro RecipeFilter.
     val filteredRecipes = RecipeFilter.filterAndSort(
         recipes = recipes,
         searchText = searchText,
@@ -107,6 +100,25 @@ private fun HomeContent(
         selectedCategoryId = selectedCategoryId,
         selectedOrder = selectedOrder
     )
+
+    val categoryIds = recipes
+        .map { it.categoryId }
+        .distinct()
+        .sorted()
+
+    val hasActiveFilters =
+        searchText.isNotBlank() ||
+                onlyFavorites ||
+                selectedCategoryId != 0 ||
+                selectedOrder != "default"
+
+    // Restablece todos los filtros.
+    val clearFilters = {
+        searchText = ""
+        onlyFavorites = false
+        selectedCategoryId = 0
+        selectedOrder = "default"
+    }
 
     Scaffold(
         topBar = {
@@ -157,6 +169,9 @@ private fun HomeContent(
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            // =========================================
+            // BUSCADOR DE RECETAS
+            // =========================================
 
             OutlinedTextField(
                 value = searchText,
@@ -171,7 +186,7 @@ private fun HomeContent(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "Buscar"
+                        contentDescription = null
                     )
                 },
                 trailingIcon = {
@@ -189,17 +204,14 @@ private fun HomeContent(
                     }
                 },
                 singleLine = true,
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp)
             )
-
 
             Spacer(modifier = Modifier.height(20.dp))
 
-
-            val categoryIds = recipes
-                .map { it.categoryId }
-                .distinct()
-                .sorted()
+            // =========================================
+            // FILTRO POR CATEGORÍAS
+            // =========================================
 
             Text(
                 text = "Categorías",
@@ -210,18 +222,22 @@ private fun HomeContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .horizontalScroll(
-                        androidx.compose.foundation.rememberScrollState()
-                    ),
+                    .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+
                 FilterChip(
                     selected = selectedCategoryId == 0,
-                    onClick = { selectedCategoryId = 0 },
-                    label = { Text("Todas") }
+                    onClick = {
+                        selectedCategoryId = 0
+                    },
+                    label = {
+                        Text("Todas")
+                    }
                 )
 
                 categoryIds.forEach { categoryId ->
+
                     FilterChip(
                         selected = selectedCategoryId == categoryId,
                         onClick = {
@@ -234,7 +250,9 @@ private fun HomeContent(
                 }
             }
 
-
+            // =========================================
+            // FAVORITOS Y ORDENAMIENTO
+            // =========================================
 
             Row(
                 modifier = Modifier
@@ -243,21 +261,33 @@ private fun HomeContent(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 FilterChip(
                     selected = !onlyFavorites,
-                    onClick = { onlyFavorites = false },
-                    label = { Text("Todas las recetas") }
+                    onClick = {
+                        onlyFavorites = false
+                    },
+                    label = {
+                        Text("Todas las recetas")
+                    }
                 )
 
                 FilterChip(
                     selected = onlyFavorites,
-                    onClick = { onlyFavorites = true },
-                    label = { Text("♥ Favoritas") }
+                    onClick = {
+                        onlyFavorites = true
+                    },
+                    label = {
+                        Text("♥ Favoritas")
+                    }
                 )
 
                 Box {
+
                     OutlinedButton(
-                        onClick = { showOrderMenu = true },
+                        onClick = {
+                            showOrderMenu = true
+                        },
                         contentPadding = PaddingValues(
                             horizontal = 12.dp,
                             vertical = 8.dp
@@ -268,10 +298,15 @@ private fun HomeContent(
 
                     DropdownMenu(
                         expanded = showOrderMenu,
-                        onDismissRequest = { showOrderMenu = false }
+                        onDismissRequest = {
+                            showOrderMenu = false
+                        }
                     ) {
+
                         DropdownMenuItem(
-                            text = { Text("Orden original") },
+                            text = {
+                                Text("Orden original")
+                            },
                             onClick = {
                                 selectedOrder = "default"
                                 showOrderMenu = false
@@ -279,7 +314,9 @@ private fun HomeContent(
                         )
 
                         DropdownMenuItem(
-                            text = { Text("Nombre (A-Z)") },
+                            text = {
+                                Text("Nombre (A-Z)")
+                            },
                             onClick = {
                                 selectedOrder = "az"
                                 showOrderMenu = false
@@ -287,7 +324,9 @@ private fun HomeContent(
                         )
 
                         DropdownMenuItem(
-                            text = { Text("Nombre (Z-A)") },
+                            text = {
+                                Text("Nombre (Z-A)")
+                            },
                             onClick = {
                                 selectedOrder = "za"
                                 showOrderMenu = false
@@ -295,7 +334,9 @@ private fun HomeContent(
                         )
 
                         DropdownMenuItem(
-                            text = { Text("Menor tiempo") },
+                            text = {
+                                Text("Menor tiempo")
+                            },
                             onClick = {
                                 selectedOrder = "fast"
                                 showOrderMenu = false
@@ -303,7 +344,9 @@ private fun HomeContent(
                         )
 
                         DropdownMenuItem(
-                            text = { Text("Mayor tiempo") },
+                            text = {
+                                Text("Mayor tiempo")
+                            },
                             onClick = {
                                 selectedOrder = "slow"
                                 showOrderMenu = false
@@ -313,33 +356,30 @@ private fun HomeContent(
                 }
             }
 
-
             Spacer(modifier = Modifier.height(12.dp))
 
-            val hasActiveFilters =
-                searchText.isNotBlank() ||
-                        onlyFavorites ||
-                        selectedCategoryId != 0 ||
-                        selectedOrder != "default"
+            // =========================================
+            // LIMPIAR FILTROS
+            // =========================================
 
             if (hasActiveFilters) {
                 TextButton(
-                    onClick = {
-                        searchText = ""
-                        onlyFavorites = false
-                        selectedCategoryId = 0
-                        selectedOrder = "default"
-                    }
+                    onClick = clearFilters
                 ) {
                     Text("Limpiar filtros")
                 }
             }
 
+            // =========================================
+            // CONTADOR DE RECETAS
+            // =========================================
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Text(
                     text = if (onlyFavorites) {
                         "Mis favoritas"
@@ -359,6 +399,10 @@ private fun HomeContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // =========================================
+            // LISTA DE RECETAS O ESTADO VACÍO
+            // =========================================
+
             if (filteredRecipes.isEmpty()) {
 
                 if (recipes.isEmpty()) {
@@ -376,17 +420,12 @@ private fun HomeContent(
                         title = "No encontramos recetas",
                         message = "Intenta buscar con otro nombre o limpia los filtros.",
                         buttonText = "Limpiar filtros",
-                        onAction = {
-                            searchText = ""
-                            onlyFavorites = false
-                            selectedCategoryId = 0
-                            selectedOrder = "default"
-                        }
+                        onAction = clearFilters
                     )
-
                 }
 
             } else {
+
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -394,10 +433,12 @@ private fun HomeContent(
                         bottom = 88.dp
                     )
                 ) {
+
                     items(
                         items = filteredRecipes,
                         key = { it.id }
                     ) { recipe ->
+
                         RecipeCard(
                             recipe = recipe,
                             onClick = {
@@ -411,52 +452,9 @@ private fun HomeContent(
     }
 }
 
-@Preview(
-    showBackground = true,
-    showSystemUi = true
-)
-
-@Composable
-fun RecipeListPreview() {
-
-    val recetasEjemplo = listOf(
-        RecipeEntity(
-            id = 1,
-            name = "Arroz con pollo",
-            categoryId = 1,
-            ingredients = "Arroz y pollo",
-            instructions = "Preparar el arroz",
-            prepTimeMinutes = 40,
-            isFavorite = true
-        ),
-        RecipeEntity(
-            id = 2,
-            name = "Ensalada de atún",
-            categoryId = 2,
-            ingredients = "Atún y vegetales",
-            instructions = "Mezclar ingredientes",
-            prepTimeMinutes = 15,
-            isFavorite = false
-        ),
-        RecipeEntity(
-            id = 3,
-            name = "Pasta con queso",
-            categoryId = 3,
-            ingredients = "Pasta y queso",
-            instructions = "Cocinar la pasta",
-            prepTimeMinutes = 25,
-            isFavorite = true
-        )
-    )
-
-    MaterialTheme {
-        HomeContent(
-            recipes = recetasEjemplo,
-            onAddRecipe = {},
-            onRecipeClick = {}
-        )
-    }
-}
+// =====================================================
+// COMPONENTE PARA LISTAS VACÍAS
+// =====================================================
 
 @Composable
 fun EmptySearchState(
@@ -468,10 +466,14 @@ fun EmptySearchState(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 40.dp, horizontal = 16.dp),
+            .padding(
+                vertical = 40.dp,
+                horizontal = 16.dp
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+
         Icon(
             imageVector = Icons.Default.SearchOff,
             contentDescription = null,
@@ -501,16 +503,23 @@ fun EmptySearchState(
     }
 }
 
+// =====================================================
+// ESTADO DE CARGA
+// =====================================================
 
 @Composable
 fun LoadingRecipesState() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 48.dp, horizontal = 16.dp),
+            .padding(
+                vertical = 48.dp,
+                horizontal = 16.dp
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+
         CircularProgressIndicator(
             color = MaterialTheme.colorScheme.primary
         )
@@ -524,27 +533,9 @@ fun LoadingRecipesState() {
     }
 }
 
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true
-)
-@Composable
-private fun LoadingRecipesStatePreview() {
-    MaterialTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                LoadingRecipesState()
-            }
-        }
-    }
-}
-
+// =====================================================
+// STATEFUL / STATELESS - ESTADOS DE LA PANTALLA
+// =====================================================
 
 @Composable
 private fun HomeStateContent(
@@ -554,11 +545,19 @@ private fun HomeStateContent(
     onRetry: () -> Unit
 ) {
     when (uiState) {
+
         is HomeUiState.Loading -> {
-            LoadingRecipesState()
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingRecipesState()
+            }
         }
 
         is HomeUiState.Success -> {
+
             HomeContent(
                 recipes = uiState.recipes,
                 onAddRecipe = onAddRecipe,
@@ -566,17 +565,19 @@ private fun HomeStateContent(
             )
         }
 
-
         is HomeUiState.Error -> {
+
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
+
                 Column(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+
                     Text(
                         text = "No pudimos cargar tus recetas",
                         style = MaterialTheme.typography.titleMedium,
@@ -589,8 +590,8 @@ private fun HomeStateContent(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
-
                     )
+
                     Button(
                         onClick = onRetry
                     ) {
@@ -599,12 +600,87 @@ private fun HomeStateContent(
                 }
             }
         }
-
     }
 }
 
+// =====================================================
+// DATOS FICTICIOS PARA PREVIEW
+// NO SE INSERTAN EN ROOM
+// =====================================================
 
-@Preview(showBackground = true, showSystemUi = true)
+private val previewRecipes = listOf(
+    RecipeEntity(
+        id = 1,
+        name = "Arroz con pollo",
+        categoryId = 1,
+        ingredients = "Arroz y pollo",
+        instructions = "Preparar el arroz",
+        prepTimeMinutes = 40,
+        isFavorite = true
+    ),
+
+    RecipeEntity(
+        id = 2,
+        name = "Ensalada de atún",
+        categoryId = 2,
+        ingredients = "Atún y vegetales",
+        instructions = "Mezclar ingredientes",
+        prepTimeMinutes = 15,
+        isFavorite = false
+    ),
+
+    RecipeEntity(
+        id = 3,
+        name = "Pasta con queso",
+        categoryId = 3,
+        ingredients = "Pasta y queso",
+        instructions = "Cocinar la pasta",
+        prepTimeMinutes = 25,
+        isFavorite = true
+    )
+)
+
+// =====================================================
+// PREVIEWS
+// =====================================================
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
+@Composable
+fun RecipeListPreview() {
+    MaterialTheme {
+        HomeContent(
+            recipes = previewRecipes,
+            onAddRecipe = {},
+            onRecipeClick = {}
+        )
+    }
+}
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
+@Composable
+private fun LoadingRecipesStatePreview() {
+    MaterialTheme {
+        Surface {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingRecipesState()
+            }
+        }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
 @Composable
 private fun HomeLoadingPreview() {
     MaterialTheme {
@@ -612,12 +688,15 @@ private fun HomeLoadingPreview() {
             uiState = HomeUiState.Loading,
             onAddRecipe = {},
             onRecipeClick = {},
-                    onRetry = {}
+            onRetry = {}
         )
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
 @Composable
 private fun HomeEmptyPreview() {
     MaterialTheme {
@@ -625,12 +704,15 @@ private fun HomeEmptyPreview() {
             uiState = HomeUiState.Success(emptyList()),
             onAddRecipe = {},
             onRecipeClick = {},
-                    onRetry = {}
+            onRetry = {}
         )
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
 @Composable
 private fun HomeErrorPreview() {
     MaterialTheme {
@@ -640,9 +722,7 @@ private fun HomeErrorPreview() {
             ),
             onAddRecipe = {},
             onRecipeClick = {},
-                    onRetry = {}
+            onRetry = {}
         )
     }
 }
-
-
