@@ -1,5 +1,8 @@
 package com.example.recipebox.ui.detail
 
+import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,10 +28,15 @@ fun RecipeDetailScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val purplePrimary = Color(0xFF6750A4)
+    val purpleContainer = Color(0xFFEADDFF)
+    val onPurpleContainer = Color(0xFF21005D)
+
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Detalle de Receta", style = MaterialTheme.typography.titleMedium) },
+                title = { Text("Detalle de Receta", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -37,7 +46,9 @@ fun RecipeDetailScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         }
@@ -49,7 +60,7 @@ fun RecipeDetailScreen(
                     .padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                CircularProgressIndicator(color = purplePrimary)
             }
         } else {
             LazyColumn(
@@ -59,12 +70,13 @@ fun RecipeDetailScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Tarjeta Principal de la Receta
+                // Tarjeta Principal de la Receta con Borde
                 item {
-                    ElevatedCard(
+                    OutlinedCard(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.elevatedCardColors(
+                        shape = RoundedCornerShape(20.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                        colors = CardDefaults.outlinedCardColors(
                             containerColor = MaterialTheme.colorScheme.surface
                         )
                     ) {
@@ -84,46 +96,58 @@ fun RecipeDetailScreen(
                     }
                 }
 
-                // Sección de Ingredientes
+                // Sección Ingredientes
                 item {
                     Text(
                         text = "Ingredientes",
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
-                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = purplePrimary,
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
 
+                // Tarjetas de cada Ingrediente con Borde
                 items(uiState.ingredients) { ingredient ->
-                    Card(
+                    OutlinedCard(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                        colors = CardDefaults.outlinedCardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
                         )
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "•",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(
+                                        color = purpleContainer,
+                                        shape = RoundedCornerShape(10.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "•",
+                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                                    color = onPurpleContainer
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(14.dp))
                             Text(
                                 text = ingredient,
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
                 }
 
-                // Botón Destacado "Iniciar Modo Cocina"
+                // Botón Iniciar Modo Cocina
                 item {
                     Spacer(modifier = Modifier.height(12.dp))
                     Button(
@@ -131,9 +155,10 @@ fun RecipeDetailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(54.dp),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
+                            containerColor = purplePrimary,
+                            contentColor = Color.White
                         )
                     ) {
                         Icon(
@@ -152,10 +177,33 @@ fun RecipeDetailScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(name = "Modo Claro", showBackground = true)
 @Composable
 fun RecipeDetailScreenPreview() {
-    RecipeBoxTheme {
+    RecipeBoxTheme(darkTheme = false) {
+        RecipeDetailScreen(
+            uiState = RecipeDetailUiState(
+                isLoading = false,
+                title = "Pasta Carbonara Tradicional",
+                description = "Deliciosa receta italiana hecha a base de huevo, queso pecorino y guanciale.",
+                ingredients = listOf(
+                    "400g de Pasta Spaghettini",
+                    "150g de Guanciale o Tocineta",
+                    "4 Yemas de huevo",
+                    "100g de Queso Pecorino Romano",
+                    "Pimienta negra recién molida"
+                )
+            ),
+            onStartCookingClick = {},
+            onBackClick = {}
+        )
+    }
+}
+
+@Preview(name = "Modo Oscuro", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Composable
+fun RecipeDetailScreenDarkPreview() {
+    RecipeBoxTheme(darkTheme = true) {
         RecipeDetailScreen(
             uiState = RecipeDetailUiState(
                 isLoading = false,
