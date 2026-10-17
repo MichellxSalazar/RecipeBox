@@ -11,7 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.recipebox.ui.theme.RecipeBoxTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,5 +147,26 @@ fun KeepScreenOn() {
         onDispose {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CookingModeScreenPreview() {
+    RecipeBoxTheme {
+        CookingModeScreen(
+            uiState = RecipeDetailUiState(
+                isLoading = false,
+                currentStepIndex = 1,
+                steps = listOf(
+                    "Paso 1: Poner a hervir abundante agua con sal en una olla grande.",
+                    "Paso 2: Dorar el guanciale picado en cubos en una sartén grande a fuego medio sin agregar aceite.",
+                    "Paso 3: Mezclar las yemas de huevo con el queso pecorino hasta formar una crema homogénea."
+                )
+            ),
+            onNextStep = {},
+            onPreviousStep = {},
+            onFinishCooking = {}
+        )
     }
 }
