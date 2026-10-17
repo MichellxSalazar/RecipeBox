@@ -8,15 +8,16 @@ import com.example.recipebox.data.local.entity.CategoryEntity
 import com.example.recipebox.repository.RecipeRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: RecipeRepository) : ViewModel() {
 
     init {
-        // Pre-populate database with default categories to avoid Foreign Key constraint failures
-        // until Modulo-Categorias implements full category management.
+        // Pre-populate database with default categories
         viewModelScope.launch {
             if (repository.getCategoryCount() == 0) {
                 repository.insertCategories(
@@ -31,6 +32,20 @@ class MainViewModel(private val repository: RecipeRepository) : ViewModel() {
         }
     }
 
+    // Estado reactivo explícito usando Sealed Class (RecipeUiState)
+    val uiState: StateFlow<RecipeUiState> = repository.getAllRecipes()
+        .map { recipes ->
+            RecipeUiState.Success(recipes) as RecipeUiState
+        }
+        .catch {
+            emit(RecipeUiState.Error("Error loading recipes"))
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = RecipeUiState.Loading
+        )
+
     val allRecipes: StateFlow<List<RecipeEntity>> = repository.getAllRecipes()
         .stateIn(
             scope = viewModelScope,
@@ -38,8 +53,6 @@ class MainViewModel(private val repository: RecipeRepository) : ViewModel() {
             initialValue = emptyList()
         )
         
-    // Simulated categories until Modulo-Categorias is merged. 
-    // We use a StateFlow to match Room's behavior.
     val allCategories: StateFlow<List<CategoryEntity>> = flowOf(
         listOf(
             CategoryEntity(id = 1, name = "Desayunos"),
