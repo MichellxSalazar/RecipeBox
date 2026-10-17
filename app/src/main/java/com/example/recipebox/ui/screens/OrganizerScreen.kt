@@ -1,5 +1,6 @@
 package com.example.recipebox.ui.screens
 
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -122,7 +123,7 @@ fun OrganizerScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            TabRow(selectedTabIndex = uiState.selectedTab.ordinal) {
+            PrimaryTabRow(selectedTabIndex = uiState.selectedTab.ordinal) {
                 Tab(
                     selected = uiState.selectedTab == OrganizerTab.CATEGORIES,
                     onClick = { onTabSelected(OrganizerTab.CATEGORIES) },
@@ -508,4 +509,68 @@ fun IngredientFormDialog(
             }
         }
     )
+}
+
+@Preview(showBackground = true, name = "Vista Previa - Categorías")
+@Composable
+private fun OrganizerScreenCategoriesPreview() {
+    MaterialTheme {
+        OrganizerScreen(
+            uiState = OrganizerUiState(
+                selectedTab = OrganizerTab.CATEGORIES,
+                categories = listOf(
+                    Category(id = 1, name = "Postres", description = "Recetas dulces y repostería"),
+                    Category(id = 2, name = "Pastas", description = "Platos principales italianos"),
+                    Category(id = 3, name = "Ensaladas", description = "Opciones frescas y ligeras")
+                )
+            ),
+            onTabSelected = {},
+            onSearchQueryChange = {},
+            onAddClick = {},
+            onEditCategory = {},
+            onDeleteCategory = {},
+            onCategoryNameChange = {},
+            onCategoryDescriptionChange = {},
+            onSaveCategory = {},
+            onDismissCategoryDialog = {},
+            onEditIngredient = {},
+            onDeleteIngredient = {},
+            onIngredientNameChange = {},
+            onIngredientUnitChange = {},
+            onSaveIngredient = {},
+            onDismissIngredientDialog = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Vista Previa - Ingredientes")
+@Composable
+private fun OrganizerScreenIngredientsPreview() {
+    MaterialTheme {
+        OrganizerScreen(
+            uiState = OrganizerUiState(
+                selectedTab = OrganizerTab.INGREDIENTS,
+                ingredients = listOf(
+                    Ingredient(id = 1, name = "Harina de trigo", defaultUnit = "g"),
+                    Ingredient(id = 2, name = "Leche entera", defaultUnit = "ml"),
+                    Ingredient(id = 3, name = "Huevos", defaultUnit = "unidad")
+                )
+            ),
+            onTabSelected = {},
+            onSearchQueryChange = {},
+            onAddClick = {},
+            onEditCategory = {},
+            onDeleteCategory = {},
+            onCategoryNameChange = {},
+            onCategoryDescriptionChange = {},
+            onSaveCategory = {},
+            onDismissCategoryDialog = {},
+            onEditIngredient = {},
+            onDeleteIngredient = {},
+            onIngredientNameChange = {},
+            onIngredientUnitChange = {},
+            onSaveIngredient = {},
+            onDismissIngredientDialog = {}
+        )
+    }
 }
