@@ -6,8 +6,9 @@ import com.example.recipebox.data.mapper.toEntity
 import com.example.recipebox.data.model.Category
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class CategoryRepositoryImpl(
+class CategoryRepositoryImpl @Inject constructor(
     private val categoryDao: CategoryDao
 ) : CategoryRepository {
 
