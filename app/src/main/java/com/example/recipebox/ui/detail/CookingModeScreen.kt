@@ -3,12 +3,13 @@ package com.example.recipebox.ui.detail
 import android.app.Activity
 import android.view.WindowManager
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
@@ -21,7 +22,6 @@ fun CookingModeScreen(
     onFinishCooking: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Mantener la pantalla encendida mientras se cocina
     if (uiState.isKeepScreenOn) {
         KeepScreenOn()
     }
@@ -29,7 +29,10 @@ fun CookingModeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Modo Cocina") }
+                title = { Text("Modo Cocina", style = MaterialTheme.typography.titleMedium) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             )
         }
     ) { innerPadding ->
@@ -37,59 +40,95 @@ fun CookingModeScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(24.dp),
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             val totalSteps = uiState.steps.size
             val currentStep = uiState.currentStepIndex
 
-            Text(
-                text = "Paso ${currentStep + 1} de $totalSteps",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
+            // Chip de progreso del paso
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.primaryContainer,
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text(
+                    text = "Paso ${currentStep + 1} de $totalSteps",
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
 
+            // Tarjeta central del paso en pantalla gigante
             if (uiState.steps.isNotEmpty() && currentStep < totalSteps) {
-                Card(
+                ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .padding(vertical = 24.dp)
+                        .padding(vertical = 20.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(16.dp),
+                            .padding(24.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = uiState.steps[currentStep],
-                            style = MaterialTheme.typography.headlineSmall,
-                            textAlign = TextAlign.Center
+                            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Medium),
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
             }
 
+            // Botones Inferiores de Navegación
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedButton(
                     onClick = onPreviousStep,
-                    enabled = currentStep > 0
+                    enabled = currentStep > 0,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Anterior")
+                    Text("Anterior", style = MaterialTheme.typography.titleMedium)
                 }
 
                 if (currentStep < totalSteps - 1) {
-                    Button(onClick = onNextStep) {
-                        Text("Siguiente")
+                    Button(
+                        onClick = onNextStep,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Siguiente", style = MaterialTheme.typography.titleMedium)
                     }
                 } else {
-                    Button(onClick = onFinishCooking) {
-                        Text("Finalizar")
+                    Button(
+                        onClick = onFinishCooking,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary
+                        )
+                    ) {
+                        Text("Finalizar", style = MaterialTheme.typography.titleMedium)
                     }
                 }
             }
@@ -106,23 +145,5 @@ fun KeepScreenOn() {
         onDispose {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
-    }
-}
-
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
-@Composable
-fun CookingModeScreenPreview() {
-    com.example.recipebox.ui.theme.RecipeBoxTheme {
-        CookingModeScreen(
-            uiState = RecipeDetailUiState(
-                isLoading = false,
-                title = "Pollo a la Plancha",
-                steps = listOf("Paso 1: Sazonar el pollo con sal y pimienta al gusto.", "Paso 2: Calentar el sartén a fuego medio.", "Paso 3: Cocinar durante 5 minutos por cada lado."),
-                currentStepIndex = 0
-            ),
-            onNextStep = {},
-            onPreviousStep = {},
-            onFinishCooking = {}
-        )
     }
 }
