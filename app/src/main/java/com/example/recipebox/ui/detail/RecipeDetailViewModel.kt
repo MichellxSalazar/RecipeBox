@@ -2,13 +2,19 @@ package com.example.recipebox.ui.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.recipebox.repository.RecipeRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class RecipeDetailViewModel : ViewModel() {
+@HiltViewModel
+class RecipeDetailViewModel @Inject constructor(
+    private val repository: RecipeRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecipeDetailUiState())
     val uiState: StateFlow<RecipeDetailUiState> = _uiState.asStateFlow()
@@ -16,17 +22,27 @@ class RecipeDetailViewModel : ViewModel() {
     fun loadRecipe(recipeId: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-
-            // Simulación de carga mientras se conecta con Room/Hilt
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    title = "Receta de Ejemplo",
-                    description = "Descripción de la receta",
-                    ingredients = listOf("Ingrediente 1", "Ingrediente 2"),
-                    steps = listOf("Paso 1: Preparar ingredientes", "Paso 2: Cocinar", "Paso 3: Servir"),
-                    errorMessage = null
-                )
+            try {
+                repository.getRecipeById(recipeId).collect { recipeEntity ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            recipe = recipeEntity,
+                            title = recipeEntity?.titulo ?: "Sin título",
+                            description = recipeEntity?.descripcion ?: "",
+                            ingredients = recipeEntity?.ingredientes ?: emptyList(),
+                            steps = recipeEntity?.pasos ?: emptyList(),
+                            errorMessage = if (recipeEntity == null) "Receta no encontrada" else null
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = e.localizedMessage ?: "Error al cargar receta"
+                    )
+                }
             }
         }
     }
