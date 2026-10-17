@@ -108,3 +108,21 @@ fun KeepScreenOn() {
         }
     }
 }
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Composable
+fun CookingModeScreenPreview() {
+    com.example.recipebox.ui.theme.RecipeBoxTheme {
+        CookingModeScreen(
+            uiState = RecipeDetailUiState(
+                isLoading = false,
+                title = "Pollo a la Plancha",
+                steps = listOf("Paso 1: Sazonar el pollo con sal y pimienta al gusto.", "Paso 2: Calentar el sartén a fuego medio.", "Paso 3: Cocinar durante 5 minutos por cada lado."),
+                currentStepIndex = 0
+            ),
+            onNextStep = {},
+            onPreviousStep = {},
+            onFinishCooking = {}
+        )
+    }
+}
