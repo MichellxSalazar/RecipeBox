@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.organizer
+package com.example.recipebox.ui.viewmodels
 
 import com.example.recipebox.data.model.Category
 import com.example.recipebox.data.model.Ingredient

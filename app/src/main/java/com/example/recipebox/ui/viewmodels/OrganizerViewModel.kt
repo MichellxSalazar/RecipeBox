@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.organizer
+package com.example.recipebox.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
