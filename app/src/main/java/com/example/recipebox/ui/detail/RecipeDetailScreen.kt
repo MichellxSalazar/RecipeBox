@@ -81,3 +81,21 @@ fun RecipeDetailScreen(
         }
     }
 }
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Composable
+fun RecipeDetailScreenPreview() {
+    com.example.recipebox.ui.theme.RecipeBoxTheme {
+        RecipeDetailScreen(
+            uiState = RecipeDetailUiState(
+                isLoading = false,
+                title = "Pollo a la Plancha",
+                description = "Una receta deliciosa y saludable.",
+                ingredients = listOf("500g de Pechuga de Pollo", "1 cucharada de Aceite de Oliva", "Sal y Pimienta"),
+                steps = listOf("Sazonar el pollo", "Calentar el sartén", "Cocinar 5 minutos por lado")
+            ),
+            onStartCookingClick = {},
+            onBackClick = {}
+        )
+    }
+}
