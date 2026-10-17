@@ -11,9 +11,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.recipebox.ui.theme.RecipeBoxTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -148,5 +149,28 @@ fun RecipeDetailScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RecipeDetailScreenPreview() {
+    RecipeBoxTheme {
+        RecipeDetailScreen(
+            uiState = RecipeDetailUiState(
+                isLoading = false,
+                title = "Pasta Carbonara Tradicional",
+                description = "Deliciosa receta italiana hecha a base de huevo, queso pecorino y guanciale.",
+                ingredients = listOf(
+                    "400g de Pasta Spaghettini",
+                    "150g de Guanciale o Tocineta",
+                    "4 Yemas de huevo",
+                    "100g de Queso Pecorino Romano",
+                    "Pimienta negra recién molida"
+                )
+            ),
+            onStartCookingClick = {},
+            onBackClick = {}
+        )
     }
 }
