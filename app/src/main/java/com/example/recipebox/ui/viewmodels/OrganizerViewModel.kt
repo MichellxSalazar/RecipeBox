@@ -1,14 +1,12 @@
 package com.example.recipebox.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.recipebox.data.model.Category
 import com.example.recipebox.data.model.Ingredient
 import com.example.recipebox.repository.CategoryRepository
 import com.example.recipebox.repository.IngredientRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,9 +16,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class OrganizerViewModel(
+@HiltViewModel
+class OrganizerViewModel @Inject constructor(
     private val categoryRepository: CategoryRepository,
     private val ingredientRepository: IngredientRepository
 ) : ViewModel() {
@@ -249,17 +249,5 @@ class OrganizerViewModel(
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
-
-        fun provideFactory(
-            categoryRepository: CategoryRepository,
-            ingredientRepository: IngredientRepository
-        ): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                OrganizerViewModel(
-                    categoryRepository = categoryRepository,
-                    ingredientRepository = ingredientRepository
-                )
-            }
-        }
     }
 }
