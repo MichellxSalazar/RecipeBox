@@ -32,7 +32,7 @@ fun AppNavigation() {
             HomeScreen(
                 viewModel = viewModel,
                 onAddRecipeClick = { navController.navigate("add_recipe") },
-                onRecipeClick = { recipe -> navController.navigate("recipe_detail/") },
+                onRecipeClick = { recipe -> navController.navigate("recipe_detail/${recipe.id}") },
                 onOrganizerClick = { navController.navigate("organizer") },
                 onSettingsClick = { navController.navigate("configuracion") }
             )
@@ -46,9 +46,9 @@ fun AppNavigation() {
         }
         composable(
             route = "recipe_detail/{recipeId}",
-            arguments = listOf(navArgument("recipeId") { type = NavType.IntType })
+            arguments = listOf(navArgument("recipeId") { type = NavType.LongType })
         ) { backStackEntry ->
-            val recipeId = backStackEntry.arguments?.getInt("recipeId") ?: -1
+            val recipeId = backStackEntry.arguments?.getLong("recipeId") ?: -1L
             val viewModel = hiltViewModel<RecetasViewModel>()
             RecipeDetailScreen(
                 recipeId = recipeId,
@@ -60,9 +60,9 @@ fun AppNavigation() {
         }
         composable(
             route = "edit_recipe/{recipeId}",
-            arguments = listOf(navArgument("recipeId") { type = NavType.IntType })
+            arguments = listOf(navArgument("recipeId") { type = NavType.LongType })
         ) { backStackEntry ->
-            val recipeId = backStackEntry.arguments?.getInt("recipeId") ?: -1
+            val recipeId = backStackEntry.arguments?.getLong("recipeId") ?: -1L
             val viewModel = hiltViewModel<RecetasViewModel>()
             EditRecipeScreen(
                 recipeId = recipeId,
@@ -101,19 +101,19 @@ fun AppNavigation() {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             ConfiguracionScreen(
                 uiState = uiState,
-                onKeepScreenOnChange = viewModel::cambiarPantallaEncendida,
-                onUseMetricSystemChange = viewModel::cambiarSistemaMetrico,
+                onPantallaEncendidaChange = viewModel::cambiarPantallaEncendida,
+                onSistemaMetricoChange = viewModel::cambiarSistemaMetrico,
                 onVolver = { navController.popBackStack() }
             )
         }
         composable(
             route = "cooking_mode/{recipeId}",
-            arguments = listOf(navArgument("recipeId") { type = NavType.IntType })
+            arguments = listOf(navArgument("recipeId") { type = NavType.LongType })
         ) { backStackEntry ->
-            val recipeId = backStackEntry.arguments?.getInt("recipeId") ?: -1
+            val recipeId = backStackEntry.arguments?.getLong("recipeId") ?: -1L
             val viewModel = hiltViewModel<RecipeDetailViewModel>()
             CookingModeScreen(
-                recipeId = recipeId.toLong(),
+                recipeId = recipeId,
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
             )

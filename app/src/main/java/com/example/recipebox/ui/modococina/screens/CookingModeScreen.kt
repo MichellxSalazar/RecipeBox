@@ -6,6 +6,8 @@ import android.view.WindowManager
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,8 +18,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.recipebox.ui.modococina.viewmodels.RecipeDetailUiState
+import com.example.recipebox.ui.modococina.viewmodels.RecipeDetailViewModel
 import com.example.recipebox.ui.theme.RecipeBoxTheme
+
+@Composable
+fun CookingModeScreen(
+    recipeId: Long,
+    viewModel: RecipeDetailViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LaunchedEffect(recipeId) {
+        viewModel.loadRecipe(recipeId)
+    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    CookingModeScreen(
+        uiState = uiState,
+        onNextStep = viewModel::nextStep,
+        onPreviousStep = viewModel::previousStep,
+        onFinishCooking = onNavigateBack,
+        modifier = modifier,
+        onNavigateBack = onNavigateBack
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,7 +53,8 @@ fun CookingModeScreen(
     onNextStep: () -> Unit,
     onPreviousStep: () -> Unit,
     onFinishCooking: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateBack: () -> Unit = onFinishCooking
 ) {
     if (uiState.isKeepScreenOn) {
         KeepScreenOn()
@@ -41,6 +69,14 @@ fun CookingModeScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Modo Cocina", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)) },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onBackground

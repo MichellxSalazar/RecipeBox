@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
@@ -50,7 +51,8 @@ import com.example.recipebox.ui.ingredientes.viewmodels.OrganizerViewModel
 @Composable
 fun OrganizerRoute(
     viewModel: OrganizerViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateBack: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -77,7 +79,8 @@ fun OrganizerRoute(
         onIngredientUnitChange = viewModel::onIngredientUnitChange,
         onSaveIngredient = viewModel::saveIngredient,
         onDismissIngredientDialog = viewModel::dismissIngredientDialog,
-        modifier = modifier
+        modifier = modifier,
+        onNavigateBack = onNavigateBack
     )
 }
 
@@ -100,13 +103,22 @@ fun OrganizerScreen(
     onIngredientUnitChange: (String) -> Unit,
     onSaveIngredient: () -> Unit,
     onDismissIngredientDialog: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateBack: () -> Unit = {}
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(text = "Categorías e Ingredientes") }
+                title = { Text(text = "Categorías e Ingredientes") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Atrás"
+                        )
+                    }
+                }
             )
         },
         floatingActionButton = {
