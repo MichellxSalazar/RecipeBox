@@ -1,7 +1,6 @@
 package com.example.recipebox.di
 
 import android.content.Context
-import androidx.room.Room
 import com.example.recipebox.data.local.RecipeDatabase
 import com.example.recipebox.data.local.dao.RecipeDao
 import com.example.recipebox.repository.RecipeRepository
