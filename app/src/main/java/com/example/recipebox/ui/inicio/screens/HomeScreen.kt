@@ -34,9 +34,9 @@ import com.example.recipebox.ui.inicio.viewmodels.RecipeFilter
 
 @Composable
 fun HomeScreen(
+    viewModel: HomeViewModel = hiltViewModel(),
     onAddRecipeClick: () -> Unit,
-    onRecipeClick: (RecipeEntity) -> Unit = {},
-    viewModel: HomeViewModel = hiltViewModel()
+    onRecipeClick: (RecipeEntity) -> Unit = {}
 ) {
     // Observamos StateFlow respetando el ciclo de vida.
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
