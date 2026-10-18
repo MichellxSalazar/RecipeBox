@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.viewmodels
+package com.example.recipebox.ui.ingredientes.viewmodels
 
 import com.example.recipebox.data.model.Category
 import com.example.recipebox.data.model.Ingredient
@@ -34,4 +34,6 @@ data class OrganizerUiState(
 
     val isIngredientInputValid: Boolean
         get() = ingredientNameInput.trim().isNotBlank() && ingredientUnitInput.trim().isNotBlank()
+
+
 }

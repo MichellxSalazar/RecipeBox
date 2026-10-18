@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.screens
+package com.example.recipebox.ui.ingredientes.screens
 
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Arrangement
@@ -43,9 +43,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.recipebox.data.model.Category
 import com.example.recipebox.data.model.Ingredient
-import com.example.recipebox.ui.viewmodels.OrganizerTab
-import com.example.recipebox.ui.viewmodels.OrganizerUiState
-import com.example.recipebox.ui.viewmodels.OrganizerViewModel
+import com.example.recipebox.ui.ingredientes.viewmodels.OrganizerTab
+import com.example.recipebox.ui.ingredientes.viewmodels.OrganizerUiState
+import com.example.recipebox.ui.ingredientes.viewmodels.OrganizerViewModel
 
 @Composable
 fun OrganizerRoute(

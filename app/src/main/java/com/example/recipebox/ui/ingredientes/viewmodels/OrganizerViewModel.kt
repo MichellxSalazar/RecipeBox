@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.viewmodels
+package com.example.recipebox.ui.ingredientes.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
