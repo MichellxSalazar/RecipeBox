@@ -1,17 +1,32 @@
-package com.example.recipebox.ui.detail
+package com.example.recipebox.ui.modococina
 
+import com.example.recipebox.ui.modococina.viewmodels.RecipeDetailViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RecipeDetailViewModelTest {
 
+    private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var viewModel: RecipeDetailViewModel
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(testDispatcher)
         viewModel = RecipeDetailViewModel()
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test

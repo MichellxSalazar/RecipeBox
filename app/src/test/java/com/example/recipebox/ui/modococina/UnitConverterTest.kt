@@ -1,5 +1,6 @@
-package com.example.recipebox.ui.detail
+package com.example.recipebox.ui.modococina
 
+import com.example.recipebox.ui.modococina.utils.UnitConverter
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
