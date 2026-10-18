@@ -1,7 +1,12 @@
+// Módulo de la aplicación: configuración de build con KSP (sin kapt)
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.kotlin.plugin.parcelize")
+    // KSP reemplaza a kapt; AGP 9.x trae Kotlin integrado y kapt no es compatible
+    alias(libs.plugins.ksp)
+    // Hilt: versión declarada únicamente en el catálogo (libs.versions.toml)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -39,10 +44,12 @@ android {
     }
 }
 
+
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
-    // UI and Material Icons
+
+    // UI y Material Icons
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.compose.ui)
@@ -50,26 +57,26 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    
-    // Room
+
+    // Room — ksp genera los DAO en tiempo de compilación
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    // Add KSP plugin to use room-compiler in Kotlin
-    // ksp(libs.androidx.room.compiler)
-    
-    // Navigation Compose
+    ksp(libs.androidx.room.compiler)
+
+    // Navegación Compose
     implementation(libs.androidx.navigation.compose)
-    
+
     // DataStore Preferences
     implementation(libs.androidx.datastore.preferences)
-    
+
     // ViewModel Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // Hilt
+    // Hilt — versión del catálogo, sin strings sueltos
     implementation(libs.hilt.android)
-    annotationProcessor(libs.hilt.compiler)
-    
+    ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
     testImplementation(libs.junit)
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     androidTestImplementation(platform(libs.androidx.compose.bom))
