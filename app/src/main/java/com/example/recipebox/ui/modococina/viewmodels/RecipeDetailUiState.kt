@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.detail
+package com.example.recipebox.ui.modococina.viewmodels
 
 import com.example.recipebox.data.local.entity.RecipeEntity
 

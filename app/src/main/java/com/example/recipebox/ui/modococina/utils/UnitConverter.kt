@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.detail
+package com.example.recipebox.ui.modococina.utils
 
 object UnitConverter {
     fun gramsToOunces(grams: Double): Double = grams * 0.035274
