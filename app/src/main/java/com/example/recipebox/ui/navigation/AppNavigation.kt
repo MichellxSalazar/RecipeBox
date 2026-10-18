@@ -1,6 +1,7 @@
 package com.example.recipebox.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,14 +14,16 @@ import com.example.recipebox.ui.screens.RecipeDetailScreen
 import com.example.recipebox.ui.viewmodels.MainViewModel
 
 @Composable
-fun AppNavigation(viewModel: MainViewModel) {
+fun AppNavigation() {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
+            val viewModel = hiltViewModel<MainViewModel>()
             HomeScreen(navController = navController, viewModel = viewModel)
         }
         composable("add_recipe") {
+            val viewModel = hiltViewModel<MainViewModel>()
             AddRecipeScreen(navController = navController, viewModel = viewModel)
         }
         composable(
@@ -28,6 +31,7 @@ fun AppNavigation(viewModel: MainViewModel) {
             arguments = listOf(navArgument("recipeId") { type = NavType.IntType })
         ) { backStackEntry ->
             val recipeId = backStackEntry.arguments?.getInt("recipeId") ?: -1
+            val viewModel = hiltViewModel<MainViewModel>()
             RecipeDetailScreen(recipeId = recipeId, navController = navController, viewModel = viewModel)
         }
         composable(
@@ -35,6 +39,7 @@ fun AppNavigation(viewModel: MainViewModel) {
             arguments = listOf(navArgument("recipeId") { type = NavType.IntType })
         ) { backStackEntry ->
             val recipeId = backStackEntry.arguments?.getInt("recipeId") ?: -1
+            val viewModel = hiltViewModel<MainViewModel>()
             EditRecipeScreen(recipeId = recipeId, navController = navController, viewModel = viewModel)
         }
     }

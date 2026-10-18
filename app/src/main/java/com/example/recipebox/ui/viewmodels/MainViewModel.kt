@@ -1,11 +1,11 @@
 package com.example.recipebox.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.recipebox.data.local.entity.RecipeEntity
 import com.example.recipebox.data.local.entity.CategoryEntity
 import com.example.recipebox.repository.RecipeRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -13,8 +13,12 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(private val repository: RecipeRepository) : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val repository: RecipeRepository
+) : ViewModel() {
 
     init {
         // Pre-populate database with default categories
@@ -82,15 +86,5 @@ class MainViewModel(private val repository: RecipeRepository) : ViewModel() {
         viewModelScope.launch {
             repository.deleteRecipe(recipe)
         }
-    }
-}
-
-class MainViewModelFactory(private val repository: RecipeRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MainViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
