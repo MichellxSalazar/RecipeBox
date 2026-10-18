@@ -1,7 +1,7 @@
 package com.example.recipebox
 
 import com.example.recipebox.data.local.entity.RecipeEntity
-import com.example.recipebox.ui.home.RecipeFilter
+import com.example.recipebox.ui.inicio.viewmodels.RecipeFilter
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
