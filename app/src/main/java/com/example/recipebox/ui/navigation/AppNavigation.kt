@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.recipebox.ui.configuracion.ConfiguracionRoute
+import com.example.recipebox.ui.configuracion.screens.ConfiguracionRoute
 import com.example.recipebox.ui.screens.AddRecipeScreen
 import com.example.recipebox.ui.screens.HomeScreen
 

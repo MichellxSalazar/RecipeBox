@@ -1,25 +1,17 @@
-
 package com.example.recipebox.repository
 
 import com.example.recipebox.data.local.dao.RecipeDao
 import com.example.recipebox.data.local.entity.RecipeEntity
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 
-@Singleton
-class RecipeRepository @Inject constructor(
-    private val recipeDao: RecipeDao
-) {
+class RecipeRepository(private val recipeDao: RecipeDao) {
 
-    fun getAllRecipes(): Flow<List<RecipeEntity>> =
-        recipeDao.getAllRecipes()
+    fun getAllRecipes(): Flow<List<RecipeEntity>> = recipeDao.getAllRecipes()
 
     fun getRecipesByCategory(categoryId: Int): Flow<List<RecipeEntity>> =
         recipeDao.getRecipesByCategory(categoryId)
 
-    suspend fun getRecipeById(id: Int): RecipeEntity? =
-        recipeDao.getRecipeById(id)
+    suspend fun getRecipeById(id: Int): RecipeEntity? = recipeDao.getRecipeById(id)
 
     suspend fun insertRecipe(recipe: RecipeEntity) {
         recipeDao.insertRecipe(recipe)
