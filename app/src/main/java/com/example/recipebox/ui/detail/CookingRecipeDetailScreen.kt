@@ -22,7 +22,7 @@ import com.example.recipebox.ui.theme.RecipeBoxTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeDetailScreen(
+fun CookingRecipeDetailScreen(
     uiState: RecipeDetailUiState,
     onStartCookingClick: () -> Unit,
     onBackClick: () -> Unit,
@@ -179,9 +179,9 @@ fun RecipeDetailScreen(
 
 @Preview(name = "Modo Claro", showBackground = true)
 @Composable
-fun RecipeDetailScreenPreview() {
+fun CookingRecipeDetailScreenPreview() {
     RecipeBoxTheme(darkTheme = false) {
-        RecipeDetailScreen(
+        CookingRecipeDetailScreen(
             uiState = RecipeDetailUiState(
                 isLoading = false,
                 title = "Pasta Carbonara Tradicional",
@@ -202,9 +202,9 @@ fun RecipeDetailScreenPreview() {
 
 @Preview(name = "Modo Oscuro", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
-fun RecipeDetailScreenDarkPreview() {
+fun CookingRecipeDetailScreenDarkPreview() {
     RecipeBoxTheme(darkTheme = true) {
-        RecipeDetailScreen(
+        CookingRecipeDetailScreen(
             uiState = RecipeDetailUiState(
                 isLoading = false,
                 title = "Pasta Carbonara Tradicional",
