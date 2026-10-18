@@ -1,10 +1,11 @@
-package com.example.recipebox.ui.configuracion
+package com.example.recipebox.ui.configuracion.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.recipebox.ui.screens.ConfiguracionScreen
+import com.example.recipebox.ui.configuracion.screens.ConfiguracionScreen
+import com.example.recipebox.ui.configuracion.viewmodels.ConfiguracionViewModel
 
 @Composable
 fun ConfiguracionRoute(

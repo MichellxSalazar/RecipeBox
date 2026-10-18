@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.configuracion
+package com.example.recipebox.ui.configuracion.viewmodels
 
 import com.example.recipebox.domain.model.PreferenciasUsuario
 
