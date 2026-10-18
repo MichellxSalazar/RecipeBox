@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.screens
+package com.example.recipebox.ui.inicio.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

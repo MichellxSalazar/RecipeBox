@@ -1,5 +1,6 @@
-package com.example.recipebox.ui.home.components
+package com.example.recipebox.ui.inicio.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -135,11 +136,10 @@ fun RecipeCardPreview() {
     }
 }
 
-
 @Preview(
     name = "Tarjeta - Modo oscuro",
     showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
 fun RecipeCardDarkPreview() {

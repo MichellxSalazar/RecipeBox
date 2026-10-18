@@ -1,11 +1,10 @@
-
-package com.example.recipebox.ui.screens
+package com.example.recipebox.ui.inicio.screens
 
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -23,40 +22,31 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.example.recipebox.data.local.entity.RecipeEntity
-import com.example.recipebox.ui.home.HomeUiState
-import com.example.recipebox.ui.home.HomeViewModel
-import com.example.recipebox.ui.home.RecipeFilter
-import com.example.recipebox.ui.home.components.RecipeCard
-import com.example.recipebox.ui.viewmodels.MainViewModel
+import com.example.recipebox.ui.inicio.components.RecipeCard
+import com.example.recipebox.ui.inicio.viewmodels.HomeUiState
+import com.example.recipebox.ui.inicio.viewmodels.HomeViewModel
+import com.example.recipebox.ui.inicio.viewmodels.RecipeFilter
 
 // =====================================================
-// PANTALLA PRINCIPAL - INTEGRACIÓN CON HILT
+// PANTALLA PRINCIPAL - INTEGRACIÓN CON HILT & STATE HOISTING
 // =====================================================
 
-@Suppress("UNUSED_PARAMETER")
 @Composable
 fun HomeScreen(
-    navController: NavController,
-    viewModel: MainViewModel
+    onAddRecipeClick: () -> Unit,
+    onRecipeClick: (RecipeEntity) -> Unit = {},
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    // Hilt proporciona automáticamente HomeViewModel.
-    val homeViewModel: HomeViewModel = hiltViewModel()
-
     // Observamos StateFlow respetando el ciclo de vida.
-    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeStateContent(
         uiState = uiState,
-        onAddRecipe = {
-            navController.navigate("add_recipe")
-        },
-        onRecipeClick = {
-            // Pendiente de integración con el módulo de detalle.
-        },
+        onAddRecipe = onAddRecipeClick,
+        onRecipeClick = onRecipeClick,
         onRetry = {
-            homeViewModel.loadRecipes()
+            viewModel.loadRecipes()
         }
     )
 }
@@ -605,7 +595,6 @@ private fun HomeStateContent(
 
 // =====================================================
 // DATOS FICTICIOS PARA PREVIEW
-// NO SE INSERTAN EN ROOM
 // =====================================================
 
 private val previewRecipes = listOf(

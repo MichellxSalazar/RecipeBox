@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.home
+package com.example.recipebox.ui.inicio.viewmodels
 
 import com.example.recipebox.data.local.entity.RecipeEntity
 
