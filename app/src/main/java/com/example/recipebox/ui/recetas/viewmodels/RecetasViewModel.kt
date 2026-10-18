@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.viewmodels
+package com.example.recipebox.ui.recetas.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,12 +16,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class RecetasViewModel @Inject constructor(
     private val repository: RecipeRepository
 ) : ViewModel() {
 
     init {
-        // Pre-populate database with default categories
+        // Pre-populate database with default categories if missing
         viewModelScope.launch {
             if (repository.getCategoryCount() == 0) {
                 repository.insertCategories(
@@ -36,7 +36,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    // Estado reactivo explícito usando Sealed Class (RecipeUiState)
     val uiState: StateFlow<RecipeUiState> = repository.getAllRecipes()
         .map { recipes ->
             RecipeUiState.Success(recipes) as RecipeUiState

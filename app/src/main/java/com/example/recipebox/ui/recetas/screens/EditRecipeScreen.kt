@@ -9,25 +9,39 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipebox.data.local.entity.RecipeEntity
-import com.example.recipebox.ui.viewmodels.MainViewModel
+import com.example.recipebox.ui.recetas.viewmodels.RecetasViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddRecipeScreen(navController: NavController, viewModel: MainViewModel) {
+fun EditRecipeScreen(
+    recipeId: Int,
+    onNavigateBack: () -> Unit,
+    viewModel: RecetasViewModel
+) {
+    val recipes by viewModel.allRecipes.collectAsState()
     val categories by viewModel.allCategories.collectAsState()
     
-    var name by rememberSaveable { mutableStateOf("") }
-    var ingredients by rememberSaveable { mutableStateOf("") }
-    var instructions by rememberSaveable { mutableStateOf("") }
-    var prepTime by rememberSaveable { mutableStateOf("") }
+    val recipeToEdit = recipes.find { it.id == recipeId }
+
+    if (recipeToEdit == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Recipe not found")
+        }
+        return
+    }
+
+    var name by rememberSaveable { mutableStateOf(recipeToEdit.name) }
+    var ingredients by rememberSaveable { mutableStateOf(recipeToEdit.ingredients) }
+    var instructions by rememberSaveable { mutableStateOf(recipeToEdit.instructions) }
+    var prepTime by rememberSaveable { mutableStateOf(recipeToEdit.prepTimeMinutes.toString()) }
     
     var expandedCategory by remember { mutableStateOf(false) }
-    var selectedCategory by rememberSaveable { mutableStateOf(1) } // Default ID
+    var selectedCategory by rememberSaveable { mutableStateOf(recipeToEdit.categoryId) }
     val selectedCategoryName = categories.find { it.id == selectedCategory }?.name ?: "Select Category"
 
     val isFormValid = name.isNotBlank() && ingredients.isNotBlank() && instructions.isNotBlank() && prepTime.isNotBlank()
@@ -35,9 +49,9 @@ fun AddRecipeScreen(navController: NavController, viewModel: MainViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Recipe") },
+                title = { Text("Edit Recipe") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -61,7 +75,7 @@ fun AddRecipeScreen(navController: NavController, viewModel: MainViewModel) {
                 label = { Text("Recipe Name") },
                 modifier = Modifier.fillMaxWidth()
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
             
             // Category Dropdown
@@ -99,7 +113,6 @@ fun AddRecipeScreen(navController: NavController, viewModel: MainViewModel) {
             OutlinedTextField(
                 value = prepTime,
                 onValueChange = { 
-                    // Only allow numbers
                     if (it.isEmpty() || it.all { char -> char.isDigit() }) {
                         prepTime = it
                     }
@@ -108,7 +121,7 @@ fun AddRecipeScreen(navController: NavController, viewModel: MainViewModel) {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
@@ -118,9 +131,9 @@ fun AddRecipeScreen(navController: NavController, viewModel: MainViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             OutlinedTextField(
                 value = instructions,
                 onValueChange = { instructions = it },
@@ -128,14 +141,14 @@ fun AddRecipeScreen(navController: NavController, viewModel: MainViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 5
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Button(
                 onClick = {
                     if (isFormValid) {
-                        viewModel.addRecipe(
-                            RecipeEntity(
+                        viewModel.updateRecipe(
+                            recipeToEdit.copy(
                                 name = name.trim(),
                                 categoryId = selectedCategory,
                                 ingredients = ingredients.trim(),
@@ -143,13 +156,13 @@ fun AddRecipeScreen(navController: NavController, viewModel: MainViewModel) {
                                 prepTimeMinutes = prepTime.toIntOrNull() ?: 0
                             )
                         )
-                        navController.popBackStack()
+                        onNavigateBack()
                     }
                 },
                 enabled = isFormValid,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Save Recipe")
+                Text("Update Recipe")
             }
         }
     }

@@ -17,14 +17,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipebox.data.local.entity.RecipeEntity
-import com.example.recipebox.ui.viewmodels.MainViewModel
+import com.example.recipebox.ui.recetas.viewmodels.RecetasViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailScreen(
     recipeId: Int,
-    navController: NavController,
-    viewModel: MainViewModel
+    onNavigateBack: () -> Unit,
+    onNavigateToEdit: (Int) -> Unit,
+    viewModel: RecetasViewModel
 ) {
     // Obtenemos todas las recetas y buscamos la que necesitamos (en un caso real se buscaría por ID en el DAO)
     val recipes by viewModel.allRecipes.collectAsState()
@@ -43,7 +44,7 @@ fun RecipeDetailScreen(
             TopAppBar(
                 title = { Text(recipe.name) },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -62,13 +63,13 @@ fun RecipeDetailScreen(
                         )
                     }
                     // Botón de Editar
-                    IconButton(onClick = { navController.navigate("edit_recipe/${recipe.id}") }) {
+                    IconButton(onClick = { onNavigateToEdit(recipe.id) }) {
                         Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
                     }
                     // Botón de Eliminar
                     IconButton(onClick = {
                         viewModel.deleteRecipe(recipe)
-                        navController.popBackStack() // Regresa tras eliminar
+                        onNavigateBack() // Regresa tras eliminar
                     }) {
                         Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                     }
