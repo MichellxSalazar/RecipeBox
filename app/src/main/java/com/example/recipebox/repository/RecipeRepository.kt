@@ -2,9 +2,12 @@ package com.example.recipebox.repository
 
 import com.example.recipebox.data.local.dao.RecipeDao
 import com.example.recipebox.data.local.entity.RecipeEntity
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
-class RecipeRepository(private val recipeDao: RecipeDao) {
+class RecipeRepository @Inject constructor(
+    private val recipeDao: RecipeDao
+) {
 
     fun getAllRecipes(): Flow<List<RecipeEntity>> = recipeDao.getAllRecipes()
 
