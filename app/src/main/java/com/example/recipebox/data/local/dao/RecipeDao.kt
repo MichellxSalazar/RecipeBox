@@ -6,11 +6,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.recipebox.data.local.entity.CategoryEntity
 import com.example.recipebox.data.local.entity.RecipeEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RecipeDao {
+    // RECIPES
     @Query("SELECT * FROM recipes")
     fun getAllRecipes(): Flow<List<RecipeEntity>>
 
@@ -28,4 +30,11 @@ interface RecipeDao {
 
     @Delete
     suspend fun deleteRecipe(recipe: RecipeEntity)
+
+    // CATEGORIES (Helper for Foreign Key Integrity)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertCategories(categories: List<CategoryEntity>)
+
+    @Query("SELECT COUNT(*) FROM categories")
+    suspend fun getCategoryCount(): Int
 }
