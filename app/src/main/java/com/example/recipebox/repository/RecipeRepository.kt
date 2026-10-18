@@ -1,14 +1,10 @@
 package com.example.recipebox.repository
 
 import com.example.recipebox.data.local.dao.RecipeDao
-import com.example.recipebox.data.local.entity.CategoryEntity
 import com.example.recipebox.data.local.entity.RecipeEntity
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
-class RecipeRepository @Inject constructor(
-    private val recipeDao: RecipeDao
-) {
+class RecipeRepository(private val recipeDao: RecipeDao) {
 
     fun getAllRecipes(): Flow<List<RecipeEntity>> = recipeDao.getAllRecipes()
 
@@ -28,10 +24,4 @@ class RecipeRepository @Inject constructor(
     suspend fun deleteRecipe(recipe: RecipeEntity) {
         recipeDao.deleteRecipe(recipe)
     }
-
-    suspend fun insertCategories(categories: List<CategoryEntity>) {
-        recipeDao.insertCategories(categories)
-    }
-
-    suspend fun getCategoryCount(): Int = recipeDao.getCategoryCount()
 }

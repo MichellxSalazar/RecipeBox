@@ -10,9 +10,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.RecipeBox"
-        android:name=".RecipeBoxApplication">
-
+        android:theme="@style/Theme.RecipeBox">
         <activity
             android:name=".MainActivity"
             android:exported="true"
