@@ -9,27 +9,27 @@ class RecipeFilterTest {
 
     private val recipes = listOf(
         RecipeEntity(
-            id = 1,
+            id = 1L,
             name = "Arroz con pollo",
-            categoryId = 1,
+            categoryId = 1L,
             ingredients = "Arroz, pollo",
             instructions = "Cocinar",
             prepTimeMinutes = 40,
             isFavorite = true
         ),
         RecipeEntity(
-            id = 2,
+            id = 2L,
             name = "Ensalada de atún",
-            categoryId = 2,
+            categoryId = 2L,
             ingredients = "Atún, vegetales",
             instructions = "Mezclar",
             prepTimeMinutes = 15,
             isFavorite = false
         ),
         RecipeEntity(
-            id = 3,
+            id = 3L,
             name = "Pasta con queso",
-            categoryId = 1,
+            categoryId = 1L,
             ingredients = "Pasta, queso",
             instructions = "Cocinar",
             prepTimeMinutes = 25,
@@ -40,7 +40,7 @@ class RecipeFilterTest {
     private fun filter(
         search: String = "",
         favorites: Boolean = false,
-        category: Int = 0,
+        category: Long = 0L,
         order: String = "default"
     ) = RecipeFilter.filterAndSort(
         recipes = recipes,
@@ -70,7 +70,7 @@ class RecipeFilterTest {
 
     @Test
     fun filterByCategory() {
-        val result = filter(category = 1)
+        val result = filter(category = 1L)
         assertEquals(2, result.size)
     }
 
@@ -97,8 +97,6 @@ class RecipeFilterTest {
         val result = filter(search = "Pizza")
         assertEquals(0, result.size)
     }
-
-
 
     @Test
     fun sortByNameDescending() {
@@ -127,7 +125,7 @@ class RecipeFilterTest {
     @Test
     fun combineCategoryAndFavorites() {
         val result = filter(
-            category = 1,
+            category = 1L,
             favorites = true
         )
 
@@ -142,12 +140,9 @@ class RecipeFilterTest {
     fun combineSearchAndCategoryWithoutResults() {
         val result = filter(
             search = "arroz",
-            category = 2
+            category = 2L
         )
 
         assertEquals(0, result.size)
     }
-
 }
-
-

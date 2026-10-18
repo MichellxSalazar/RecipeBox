@@ -16,7 +16,7 @@ class RecipeDetailViewModel @Inject constructor() : ViewModel() {
     private val _uiState = MutableStateFlow(RecipeDetailUiState())
     val uiState: StateFlow<RecipeDetailUiState> = _uiState.asStateFlow()
 
-    fun loadRecipe(recipeId: Int) {
+    fun loadRecipe(recipeId: Long) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
@@ -42,6 +42,11 @@ class RecipeDetailViewModel @Inject constructor() : ViewModel() {
                 )
             }
         }
+    }
+
+    // Sobrecarga para compatibilidad con Int
+    fun loadRecipe(recipeId: Int) {
+        loadRecipe(recipeId.toLong())
     }
 
     fun nextStep() {

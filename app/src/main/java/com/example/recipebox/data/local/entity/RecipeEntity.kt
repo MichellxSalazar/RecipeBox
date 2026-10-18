@@ -17,10 +17,10 @@ import androidx.room.PrimaryKey
 )
 data class RecipeEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0L,
     val name: String,
-    val categoryId: Int,
-    val ingredients: String, // Can be a JSON string or related to another entity
+    val categoryId: Long,
+    val ingredients: String, // Cadena de texto con los ingredientes de la receta
     val instructions: String,
     val prepTimeMinutes: Int,
     val isFavorite: Boolean = false

@@ -2,13 +2,14 @@ package com.example.recipebox.ui.inicio.viewmodels
 
 import com.example.recipebox.data.local.entity.RecipeEntity
 
+// Utilidad para filtrar y ordenar recetas en la pantalla de inicio
 object RecipeFilter {
 
     fun filterAndSort(
         recipes: List<RecipeEntity>,
         searchText: String,
         onlyFavorites: Boolean,
-        selectedCategoryId: Int,
+        selectedCategoryId: Long,
         selectedOrder: String
     ): List<RecipeEntity> {
 
@@ -22,7 +23,7 @@ object RecipeFilter {
                 !onlyFavorites || recipe.isFavorite
 
             val matchesCategory =
-                selectedCategoryId == 0 ||
+                selectedCategoryId == 0L ||
                         recipe.categoryId == selectedCategoryId
 
             matchesSearch && matchesFavorites && matchesCategory
@@ -36,4 +37,19 @@ object RecipeFilter {
             else -> filtered
         }
     }
+
+    // Sobrecarga para compatibilidad con parámetros Int
+    fun filterAndSort(
+        recipes: List<RecipeEntity>,
+        searchText: String,
+        onlyFavorites: Boolean,
+        selectedCategoryId: Int,
+        selectedOrder: String
+    ): List<RecipeEntity> = filterAndSort(
+        recipes = recipes,
+        searchText = searchText,
+        onlyFavorites = onlyFavorites,
+        selectedCategoryId = selectedCategoryId.toLong(),
+        selectedOrder = selectedOrder
+    )
 }

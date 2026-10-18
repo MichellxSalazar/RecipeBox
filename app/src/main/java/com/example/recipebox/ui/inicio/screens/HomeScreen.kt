@@ -8,9 +8,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -36,7 +38,9 @@ import com.example.recipebox.ui.inicio.viewmodels.RecipeFilter
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onAddRecipeClick: () -> Unit,
-    onRecipeClick: (RecipeEntity) -> Unit = {}
+    onRecipeClick: (RecipeEntity) -> Unit = {},
+    onOrganizerClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
 ) {
     // Observamos StateFlow respetando el ciclo de vida.
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -45,6 +49,8 @@ fun HomeScreen(
         uiState = uiState,
         onAddRecipe = onAddRecipeClick,
         onRecipeClick = onRecipeClick,
+        onOrganizerClick = onOrganizerClick,
+        onSettingsClick = onSettingsClick,
         onRetry = {
             viewModel.loadRecipes()
         }
@@ -60,7 +66,9 @@ fun HomeScreen(
 private fun HomeContent(
     recipes: List<RecipeEntity>,
     onAddRecipe: () -> Unit,
-    onRecipeClick: (RecipeEntity) -> Unit
+    onRecipeClick: (RecipeEntity) -> Unit,
+    onOrganizerClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
 ) {
     var searchText by rememberSaveable {
         mutableStateOf("")
@@ -71,7 +79,7 @@ private fun HomeContent(
     }
 
     var selectedCategoryId by rememberSaveable {
-        mutableIntStateOf(0)
+        mutableLongStateOf(0L)
     }
 
     var selectedOrder by rememberSaveable {
@@ -99,14 +107,14 @@ private fun HomeContent(
     val hasActiveFilters =
         searchText.isNotBlank() ||
                 onlyFavorites ||
-                selectedCategoryId != 0 ||
+                selectedCategoryId != 0L ||
                 selectedOrder != "default"
 
     // Restablece todos los filtros.
     val clearFilters = {
         searchText = ""
         onlyFavorites = false
-        selectedCategoryId = 0
+        selectedCategoryId = 0L
         selectedOrder = "default"
     }
 
@@ -118,6 +126,20 @@ private fun HomeContent(
                         text = "RecipeBox",
                         fontWeight = FontWeight.Bold
                     )
+                },
+                actions = {
+                    IconButton(onClick = onOrganizerClick) {
+                        Icon(
+                            imageVector = Icons.Default.Category,
+                            contentDescription = "Organizador"
+                        )
+                    }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Configuración"
+                        )
+                    }
                 }
             )
         },
@@ -217,9 +239,9 @@ private fun HomeContent(
             ) {
 
                 FilterChip(
-                    selected = selectedCategoryId == 0,
+                    selected = selectedCategoryId == 0L,
                     onClick = {
-                        selectedCategoryId = 0
+                        selectedCategoryId = 0L
                     },
                     label = {
                         Text("Todas")
@@ -532,6 +554,8 @@ private fun HomeStateContent(
     uiState: HomeUiState,
     onAddRecipe: () -> Unit,
     onRecipeClick: (RecipeEntity) -> Unit,
+    onOrganizerClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     onRetry: () -> Unit
 ) {
     when (uiState) {
@@ -551,7 +575,9 @@ private fun HomeStateContent(
             HomeContent(
                 recipes = uiState.recipes,
                 onAddRecipe = onAddRecipe,
-                onRecipeClick = onRecipeClick
+                onRecipeClick = onRecipeClick,
+                onOrganizerClick = onOrganizerClick,
+                onSettingsClick = onSettingsClick
             )
         }
 
@@ -599,9 +625,9 @@ private fun HomeStateContent(
 
 private val previewRecipes = listOf(
     RecipeEntity(
-        id = 1,
+        id = 1L,
         name = "Arroz con pollo",
-        categoryId = 1,
+        categoryId = 1L,
         ingredients = "Arroz y pollo",
         instructions = "Preparar el arroz",
         prepTimeMinutes = 40,
@@ -609,9 +635,9 @@ private val previewRecipes = listOf(
     ),
 
     RecipeEntity(
-        id = 2,
+        id = 2L,
         name = "Ensalada de atún",
-        categoryId = 2,
+        categoryId = 2L,
         ingredients = "Atún y vegetales",
         instructions = "Mezclar ingredientes",
         prepTimeMinutes = 15,
@@ -619,9 +645,9 @@ private val previewRecipes = listOf(
     ),
 
     RecipeEntity(
-        id = 3,
+        id = 3L,
         name = "Pasta con queso",
-        categoryId = 3,
+        categoryId = 3L,
         ingredients = "Pasta y queso",
         instructions = "Cocinar la pasta",
         prepTimeMinutes = 25,

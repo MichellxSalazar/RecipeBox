@@ -121,9 +121,9 @@ fun RecipeCardPreview() {
             Box(modifier = Modifier.padding(16.dp)) {
                 RecipeCard(
                     recipe = RecipeEntity(
-                        id = 1,
+                        id = 1L,
                         name = "Arroz con pollo",
-                        categoryId = 1,
+                        categoryId = 1L,
                         ingredients = "Arroz y pollo",
                         instructions = "Preparar el arroz",
                         prepTimeMinutes = 40,
@@ -152,9 +152,9 @@ fun RecipeCardDarkPreview() {
             ) {
                 RecipeCard(
                     recipe = RecipeEntity(
-                        id = 1,
+                        id = 1L,
                         name = "Arroz con pollo",
-                        categoryId = 1,
+                        categoryId = 1L,
                         ingredients = "Arroz y pollo",
                         instructions = "Preparar el arroz",
                         prepTimeMinutes = 40,

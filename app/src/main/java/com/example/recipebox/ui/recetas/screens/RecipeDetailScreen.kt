@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.screens
+package com.example.recipebox.ui.recetas.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,34 +7,35 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.recipebox.data.local.entity.RecipeEntity
 import com.example.recipebox.ui.recetas.viewmodels.RecetasViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailScreen(
-    recipeId: Int,
+    recipeId: Long,
     onNavigateBack: () -> Unit,
-    onNavigateToEdit: (Int) -> Unit,
+    onNavigateToEdit: (Long) -> Unit,
+    onStartCooking: (Long) -> Unit,
     viewModel: RecetasViewModel
 ) {
-    // Obtenemos todas las recetas y buscamos la que necesitamos (en un caso real se buscaría por ID en el DAO)
+    // Obtenemos todas las recetas y buscamos por ID
     val recipes by viewModel.allRecipes.collectAsState()
     val recipe = recipes.find { it.id == recipeId }
 
     if (recipe == null) {
-        // Manejo de error si la receta no se encuentra o acaba de ser eliminada
+        // La receta no existe o acaba de ser eliminada
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Recipe not found.")
+            Text("Receta no encontrada.")
         }
         return
     }
@@ -47,34 +48,42 @@ fun RecipeDetailScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Volver"
                         )
                     }
                 },
                 actions = {
                     // Botón de Favorito
-                    IconButton(onClick = { 
-                        viewModel.updateRecipe(recipe.copy(isFavorite = !recipe.isFavorite)) 
+                    IconButton(onClick = {
+                        viewModel.updateRecipe(recipe.copy(isFavorite = !recipe.isFavorite))
                     }) {
                         Icon(
                             imageVector = if (recipe.isFavorite) Icons.Filled.Star else Icons.Filled.StarBorder,
-                            contentDescription = "Toggle Favorite",
+                            contentDescription = "Alternar favorito",
                             tint = if (recipe.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                         )
                     }
                     // Botón de Editar
                     IconButton(onClick = { onNavigateToEdit(recipe.id) }) {
-                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Editar")
                     }
                     // Botón de Eliminar
                     IconButton(onClick = {
                         viewModel.deleteRecipe(recipe)
-                        onNavigateBack() // Regresa tras eliminar
+                        onNavigateBack()
                     }) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Eliminar")
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { onStartCooking(recipe.id) }) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = "Iniciar modo cocina"
+                )
+            }
         }
     ) { padding ->
         Column(
@@ -94,12 +103,12 @@ fun RecipeDetailScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Preparation Time: ",
+                        text = "Tiempo de preparación: ",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "${recipe.prepTimeMinutes} minutes",
+                        text = "${recipe.prepTimeMinutes} minutos",
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -109,7 +118,7 @@ fun RecipeDetailScreen(
 
             // Sección de Ingredientes
             Text(
-                text = "Ingredients",
+                text = "Ingredientes",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -130,7 +139,7 @@ fun RecipeDetailScreen(
 
             // Sección de Instrucciones
             Text(
-                text = "Instructions",
+                text = "Instrucciones",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary

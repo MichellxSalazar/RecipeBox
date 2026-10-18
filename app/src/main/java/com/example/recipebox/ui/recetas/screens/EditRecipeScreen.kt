@@ -1,4 +1,4 @@
-package com.example.recipebox.ui.screens
+package com.example.recipebox.ui.recetas.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,29 +8,29 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.recipebox.ui.recetas.viewmodels.RecetasViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditRecipeScreen(
-    recipeId: Int,
+    recipeId: Long,
     onNavigateBack: () -> Unit,
     viewModel: RecetasViewModel
 ) {
     val recipes by viewModel.allRecipes.collectAsState()
     val categories by viewModel.allCategories.collectAsState()
-    
+
     val recipeToEdit = recipes.find { it.id == recipeId }
 
     if (recipeToEdit == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Recipe not found")
+            Text("Receta no encontrada")
         }
         return
     }
@@ -39,22 +39,23 @@ fun EditRecipeScreen(
     var ingredients by rememberSaveable { mutableStateOf(recipeToEdit.ingredients) }
     var instructions by rememberSaveable { mutableStateOf(recipeToEdit.instructions) }
     var prepTime by rememberSaveable { mutableStateOf(recipeToEdit.prepTimeMinutes.toString()) }
-    
+
     var expandedCategory by remember { mutableStateOf(false) }
+    // selectedCategory usa Long para coincidir con CategoryEntity.id y RecipeEntity.categoryId
     var selectedCategory by rememberSaveable { mutableStateOf(recipeToEdit.categoryId) }
-    val selectedCategoryName = categories.find { it.id == selectedCategory }?.name ?: "Select Category"
+    val selectedCategoryName = categories.find { it.id == selectedCategory }?.name ?: "Seleccionar categoría"
 
     val isFormValid = name.isNotBlank() && ingredients.isNotBlank() && instructions.isNotBlank() && prepTime.isNotBlank()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Recipe") },
+                title = { Text("Editar receta") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Volver"
                         )
                     }
                 }
@@ -72,13 +73,13 @@ fun EditRecipeScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Recipe Name") },
+                label = { Text("Nombre de la receta") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-            
-            // Category Dropdown
+
+            // Desplegable de categorías
             ExposedDropdownMenuBox(
                 expanded = expandedCategory,
                 onExpandedChange = { expandedCategory = !expandedCategory }
@@ -87,7 +88,7 @@ fun EditRecipeScreen(
                     value = selectedCategoryName,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Category") },
+                    label = { Text("Categoría") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory) },
                     colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     modifier = Modifier.menuAnchor().fillMaxWidth()
@@ -109,15 +110,15 @@ fun EditRecipeScreen(
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             OutlinedTextField(
                 value = prepTime,
-                onValueChange = { 
+                onValueChange = {
                     if (it.isEmpty() || it.all { char -> char.isDigit() }) {
                         prepTime = it
                     }
                 },
-                label = { Text("Prep Time (minutes)") },
+                label = { Text("Tiempo de preparación (minutos)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -127,7 +128,7 @@ fun EditRecipeScreen(
             OutlinedTextField(
                 value = ingredients,
                 onValueChange = { ingredients = it },
-                label = { Text("Ingredients") },
+                label = { Text("Ingredientes") },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3
             )
@@ -137,7 +138,7 @@ fun EditRecipeScreen(
             OutlinedTextField(
                 value = instructions,
                 onValueChange = { instructions = it },
-                label = { Text("Instructions") },
+                label = { Text("Instrucciones") },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 5
             )
@@ -162,7 +163,7 @@ fun EditRecipeScreen(
                 enabled = isFormValid,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Update Recipe")
+                Text("Actualizar receta")
             }
         }
     }
