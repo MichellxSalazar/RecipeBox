@@ -1,6 +1,7 @@
 package com.example.recipebox.di
 
 import android.content.Context
+import com.example.recipebox.data.local.DatabasePrepopulator
 import com.example.recipebox.data.local.RecipeDatabase
 import com.example.recipebox.data.local.dao.RecipeDao
 import com.example.recipebox.data.local.dao.CategoryDao
@@ -16,6 +17,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 @Module
@@ -27,7 +31,16 @@ object AppModule {
     fun provideDatabase(
         @ApplicationContext context: Context
     ): RecipeDatabase {
-        return RecipeDatabase.getDatabase(context)
+        val database = RecipeDatabase.getDatabase(context)
+        // Disparar pre-población asíncrona de datos predeterminados (categorías, ingredientes y recetas)
+        CoroutineScope(Dispatchers.IO).launch {
+            DatabasePrepopulator.prepopulateIfNeeded(
+                database.recipeDao(),
+                database.categoryDao(),
+                database.ingredientDao()
+            )
+        }
+        return database
     }
 
     @Provides

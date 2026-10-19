@@ -21,8 +21,14 @@ interface IngredientDao {
     @Query("SELECT * FROM ingredients WHERE id = :id")
     suspend fun getIngredientById(id: Long): IngredientEntity?
 
+    @Query("SELECT COUNT(*) FROM ingredients")
+    suspend fun getIngredientCount(): Int
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertIngredient(ingredient: IngredientEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIngredients(ingredients: List<IngredientEntity>)
 
     @Update
     suspend fun updateIngredient(ingredient: IngredientEntity)

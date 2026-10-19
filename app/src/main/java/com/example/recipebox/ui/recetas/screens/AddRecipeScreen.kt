@@ -16,6 +16,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.recipebox.data.local.entity.CategoryEntity
 import com.example.recipebox.data.local.entity.RecipeEntity
+import com.example.recipebox.data.model.Ingredient
+import com.example.recipebox.ui.recetas.components.IngredientInputSection
 import com.example.recipebox.ui.recetas.viewmodels.RecetasViewModel
 import com.example.recipebox.ui.recetas.viewmodels.RecipeEvent
 
@@ -29,6 +31,8 @@ fun AddRecipeScreen(
     viewModel: RecetasViewModel = hiltViewModel()
 ) {
     val categories by viewModel.allCategories.collectAsStateWithLifecycle()
+    val availableIngredients by viewModel.allIngredients.collectAsStateWithLifecycle()
+    val useMetricSystem by viewModel.useMetricSystem.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Consumo seguro de eventos puntuales (One-off events)
@@ -44,9 +48,12 @@ fun AddRecipeScreen(
 
     AddRecipeContent(
         categories = categories,
+        availableIngredients = availableIngredients,
+        useMetricSystem = useMetricSystem,
         snackbarHostState = snackbarHostState,
         onNavigateBack = onNavigateBack,
-        onSaveRecipe = { recipe -> viewModel.addRecipe(recipe) }
+        onSaveRecipe = { recipe -> viewModel.addRecipe(recipe) },
+        onSaveNewIngredient = viewModel::saveNewIngredient
     )
 }
 
@@ -59,9 +66,12 @@ fun AddRecipeScreen(
 @Composable
 fun AddRecipeContent(
     categories: List<CategoryEntity>,
+    availableIngredients: List<Ingredient> = emptyList(),
+    useMetricSystem: Boolean = true,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onNavigateBack: () -> Unit,
-    onSaveRecipe: (RecipeEntity) -> Unit
+    onSaveRecipe: (RecipeEntity) -> Unit,
+    onSaveNewIngredient: (String, String, (Ingredient?) -> Unit) -> Unit = { _, _, cb -> cb(null) }
 ) {
     var name by rememberSaveable { mutableStateOf("") }
     var ingredients by rememberSaveable { mutableStateOf("") }
@@ -106,7 +116,7 @@ fun AddRecipeContent(
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = prepTime,
@@ -117,7 +127,7 @@ fun AddRecipeContent(
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Selector de categorías
             ExposedDropdownMenuBox(
@@ -151,17 +161,18 @@ fun AddRecipeContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = ingredients,
-                onValueChange = { ingredients = it },
-                label = { Text("Ingredientes") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 3
+            // Selector interactivo de ingredientes con soporte de guardado automático
+            IngredientInputSection(
+                ingredientsText = ingredients,
+                onIngredientsTextChange = { ingredients = it },
+                availableIngredients = availableIngredients,
+                onSaveNewIngredient = onSaveNewIngredient,
+                useMetricSystem = useMetricSystem
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = instructions,
@@ -171,7 +182,7 @@ fun AddRecipeContent(
                 minLines = 5
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Button(
                 onClick = {

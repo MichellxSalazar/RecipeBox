@@ -23,7 +23,8 @@ import androidx.compose.material3.darkColorScheme
 fun RecipeCard(
     recipe: RecipeEntity,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    categoryName: String? = null
 ) {
     Card(
         onClick = onClick,
@@ -60,7 +61,7 @@ fun RecipeCard(
 
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
                     text = recipe.name,
@@ -72,20 +73,39 @@ fun RecipeCard(
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Schedule,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Schedule,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
 
-                    Text(
-                        text = "${recipe.prepTimeMinutes} min",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                        Text(
+                            text = "${recipe.prepTimeMinutes} min",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    if (!categoryName.isNullOrBlank()) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.secondaryContainer
+                        ) {
+                            Text(
+                                text = categoryName,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
                 }
 
                 if (recipe.isFavorite) {
@@ -129,6 +149,7 @@ fun RecipeCardPreview() {
                         prepTimeMinutes = 40,
                         isFavorite = true
                     ),
+                    categoryName = "Almuerzos",
                     onClick = {}
                 )
             }
@@ -160,6 +181,7 @@ fun RecipeCardDarkPreview() {
                         prepTimeMinutes = 40,
                         isFavorite = true
                     ),
+                    categoryName = "Almuerzos",
                     onClick = {}
                 )
             }

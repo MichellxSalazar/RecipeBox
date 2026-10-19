@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipebox.data.local.entity.CategoryEntity
 import com.example.recipebox.data.local.entity.RecipeEntity
+import com.example.recipebox.data.model.Ingredient
+import com.example.recipebox.data.preferences.UserPreferencesRepository
 import com.example.recipebox.repository.CategoryRepository
+import com.example.recipebox.repository.IngredientRepository
 import com.example.recipebox.repository.RecipeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -29,7 +32,9 @@ sealed interface RecipeEvent {
 @HiltViewModel
 class RecetasViewModel @Inject constructor(
     private val repository: RecipeRepository,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val ingredientRepository: IngredientRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     // Canal para eventos puntuales de una sola vez
@@ -96,6 +101,20 @@ class RecetasViewModel @Inject constructor(
             )
         )
 
+    val allIngredients: StateFlow<List<Ingredient>> = ingredientRepository.observeIngredients()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val useMetricSystem: StateFlow<Boolean> = userPreferencesRepository.useMetricSystemFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
+        )
+
     fun addRecipe(recipe: RecipeEntity) {
         viewModelScope.launch {
             try {
@@ -125,6 +144,25 @@ class RecetasViewModel @Inject constructor(
                 _events.send(RecipeEvent.RecipeDeleted)
             } catch (e: Exception) {
                 _events.send(RecipeEvent.ShowMessage(e.message ?: "Error al eliminar la receta"))
+            }
+        }
+    }
+
+    fun saveNewIngredient(name: String, unit: String, onComplete: (Ingredient?) -> Unit) {
+        viewModelScope.launch {
+            val trimmedName = name.trim()
+            val trimmedUnit = unit.trim().ifEmpty { "g" }
+            if (trimmedName.isNotBlank()) {
+                val ingredient = Ingredient(name = trimmedName, defaultUnit = trimmedUnit)
+                val result = ingredientRepository.saveIngredient(ingredient)
+                if (result.isSuccess) {
+                    val id = result.getOrNull() ?: 0L
+                    onComplete(ingredient.copy(id = id))
+                } else {
+                    onComplete(null)
+                }
+            } else {
+                onComplete(null)
             }
         }
     }

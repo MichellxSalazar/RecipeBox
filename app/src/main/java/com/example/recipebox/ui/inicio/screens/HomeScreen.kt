@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.recipebox.data.local.entity.CategoryEntity
 import com.example.recipebox.data.local.entity.RecipeEntity
 import com.example.recipebox.ui.inicio.components.RecipeCard
 import com.example.recipebox.ui.inicio.viewmodels.HomeUiState
@@ -65,6 +66,7 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     recipes: List<RecipeEntity>,
+    categories: List<CategoryEntity> = emptyList(),
     onAddRecipe: () -> Unit,
     onRecipeClick: (RecipeEntity) -> Unit,
     onOrganizerClick: () -> Unit = {},
@@ -99,10 +101,9 @@ private fun HomeContent(
         selectedOrder = selectedOrder
     )
 
-    val categoryIds = recipes
-        .map { it.categoryId }
-        .distinct()
-        .sorted()
+    val categoryMap = remember(categories) {
+        categories.associateBy { it.id }
+    }
 
     val hasActiveFilters =
         searchText.isNotBlank() ||
@@ -231,6 +232,8 @@ private fun HomeContent(
                 fontWeight = FontWeight.SemiBold
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -248,19 +251,20 @@ private fun HomeContent(
                     }
                 )
 
-                categoryIds.forEach { categoryId ->
-
+                categories.forEach { category ->
                     FilterChip(
-                        selected = selectedCategoryId == categoryId,
+                        selected = selectedCategoryId == category.id,
                         onClick = {
-                            selectedCategoryId = categoryId
+                            selectedCategoryId = if (selectedCategoryId == category.id) 0L else category.id
                         },
                         label = {
-                            Text("Categoría $categoryId")
+                            Text(category.name)
                         }
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             // =========================================
             // FAVORITOS Y ORDENAMIENTO
@@ -453,6 +457,7 @@ private fun HomeContent(
 
                         RecipeCard(
                             recipe = recipe,
+                            categoryName = categoryMap[recipe.categoryId]?.name,
                             onClick = {
                                 onRecipeClick(recipe)
                             }
@@ -574,6 +579,7 @@ private fun HomeStateContent(
 
             HomeContent(
                 recipes = uiState.recipes,
+                categories = uiState.categories,
                 onAddRecipe = onAddRecipe,
                 onRecipeClick = onRecipeClick,
                 onOrganizerClick = onOrganizerClick,
@@ -655,6 +661,13 @@ private val previewRecipes = listOf(
     )
 )
 
+private val previewCategories = listOf(
+    CategoryEntity(id = 1L, name = "Desayunos"),
+    CategoryEntity(id = 2L, name = "Almuerzos"),
+    CategoryEntity(id = 3L, name = "Cenas"),
+    CategoryEntity(id = 4L, name = "Postres")
+)
+
 // =====================================================
 // PREVIEWS
 // =====================================================
@@ -668,6 +681,7 @@ fun RecipeListPreview() {
     MaterialTheme {
         HomeContent(
             recipes = previewRecipes,
+            categories = previewCategories,
             onAddRecipe = {},
             onRecipeClick = {}
         )
