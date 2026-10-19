@@ -8,35 +8,74 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.recipebox.data.local.entity.CategoryEntity
 import com.example.recipebox.data.local.entity.RecipeEntity
 import com.example.recipebox.ui.recetas.viewmodels.RecetasViewModel
+import com.example.recipebox.ui.recetas.viewmodels.RecipeEvent
 
-@OptIn(ExperimentalMaterial3Api::class)
+// =====================================================
+// CONTENEDOR CON ESTADO (STATEFUL COMPOSABLE)
+// =====================================================
+
 @Composable
 fun AddRecipeScreen(
     onNavigateBack: () -> Unit,
-    viewModel: RecetasViewModel
+    viewModel: RecetasViewModel = hiltViewModel()
 ) {
-    val categories by viewModel.allCategories.collectAsState()
+    val categories by viewModel.allCategories.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
+    // Consumo seguro de eventos puntuales (One-off events)
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is RecipeEvent.RecipeSaved -> onNavigateBack()
+                is RecipeEvent.ShowMessage -> snackbarHostState.showSnackbar(event.message)
+                else -> Unit
+            }
+        }
+    }
+
+    AddRecipeContent(
+        categories = categories,
+        snackbarHostState = snackbarHostState,
+        onNavigateBack = onNavigateBack,
+        onSaveRecipe = { recipe -> viewModel.addRecipe(recipe) }
+    )
+}
+
+// =====================================================
+// VISTA SIN ESTADO (STATELESS COMPOSABLE)
+// Solo recibe estados inmutables y lambdas de acción
+// =====================================================
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddRecipeContent(
+    categories: List<CategoryEntity>,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onNavigateBack: () -> Unit,
+    onSaveRecipe: (RecipeEntity) -> Unit
+) {
     var name by rememberSaveable { mutableStateOf("") }
     var ingredients by rememberSaveable { mutableStateOf("") }
     var instructions by rememberSaveable { mutableStateOf("") }
     var prepTime by rememberSaveable { mutableStateOf("") }
 
     var expandedCategory by remember { mutableStateOf(false) }
-    // selectedCategory usa Long para coincidir con CategoryEntity.id
     var selectedCategory by rememberSaveable { mutableStateOf(1L) }
     val selectedCategoryName = categories.find { it.id == selectedCategory }?.name ?: "Seleccionar categoría"
 
     val isFormValid = name.isNotBlank() && ingredients.isNotBlank() && instructions.isNotBlank() && prepTime.isNotBlank()
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Agregar receta") },
@@ -63,12 +102,24 @@ fun AddRecipeScreen(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Nombre de la receta") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Desplegable de categorías
+            OutlinedTextField(
+                value = prepTime,
+                onValueChange = { prepTime = it },
+                label = { Text("Tiempo de preparación (minutos)") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Selector de categorías
             ExposedDropdownMenuBox(
                 expanded = expandedCategory,
                 onExpandedChange = { expandedCategory = !expandedCategory }
@@ -79,9 +130,11 @@ fun AddRecipeScreen(
                     readOnly = true,
                     label = { Text("Categoría") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory) },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
                 )
+
                 ExposedDropdownMenu(
                     expanded = expandedCategory,
                     onDismissRequest = { expandedCategory = false }
@@ -97,21 +150,6 @@ fun AddRecipeScreen(
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = prepTime,
-                onValueChange = {
-                    // Solo se permiten números
-                    if (it.isEmpty() || it.all { char -> char.isDigit() }) {
-                        prepTime = it
-                    }
-                },
-                label = { Text("Tiempo de preparación (minutos)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -138,7 +176,7 @@ fun AddRecipeScreen(
             Button(
                 onClick = {
                     if (isFormValid) {
-                        viewModel.addRecipe(
+                        onSaveRecipe(
                             RecipeEntity(
                                 name = name.trim(),
                                 categoryId = selectedCategory,
@@ -147,7 +185,6 @@ fun AddRecipeScreen(
                                 prepTimeMinutes = prepTime.toIntOrNull() ?: 0
                             )
                         )
-                        onNavigateBack()
                     }
                 },
                 enabled = isFormValid,

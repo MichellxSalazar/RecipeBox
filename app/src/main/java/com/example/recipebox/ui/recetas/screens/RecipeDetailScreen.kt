@@ -12,28 +12,72 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.recipebox.data.local.entity.RecipeEntity
 import com.example.recipebox.ui.recetas.viewmodels.RecetasViewModel
+import com.example.recipebox.ui.recetas.viewmodels.RecipeEvent
 
-@OptIn(ExperimentalMaterial3Api::class)
+// =====================================================
+// CONTENEDOR CON ESTADO (STATEFUL COMPOSABLE)
+// =====================================================
+
 @Composable
 fun RecipeDetailScreen(
     recipeId: Long,
     onNavigateBack: () -> Unit,
     onNavigateToEdit: (Long) -> Unit,
     onStartCooking: (Long) -> Unit,
-    viewModel: RecetasViewModel
+    viewModel: RecetasViewModel = hiltViewModel()
 ) {
-    // Obtenemos todas las recetas y buscamos por ID
-    val recipes by viewModel.allRecipes.collectAsState()
+    val recipes by viewModel.allRecipes.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Consumo seguro de eventos puntuales (One-off events)
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is RecipeEvent.RecipeDeleted -> onNavigateBack()
+                is RecipeEvent.ShowMessage -> snackbarHostState.showSnackbar(event.message)
+                else -> Unit
+            }
+        }
+    }
+
     val recipe = recipes.find { it.id == recipeId }
 
+    RecipeDetailContent(
+        recipe = recipe,
+        snackbarHostState = snackbarHostState,
+        onNavigateBack = onNavigateBack,
+        onNavigateToEdit = onNavigateToEdit,
+        onStartCooking = onStartCooking,
+        onToggleFavorite = { r -> viewModel.updateRecipe(r.copy(isFavorite = !r.isFavorite)) },
+        onDeleteRecipe = { r -> viewModel.deleteRecipe(r) }
+    )
+}
+
+// =====================================================
+// VISTA SIN ESTADO (STATELESS COMPOSABLE)
+// Solo recibe estados inmutables y lambdas de acción
+// =====================================================
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RecipeDetailContent(
+    recipe: RecipeEntity?,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onNavigateBack: () -> Unit,
+    onNavigateToEdit: (Long) -> Unit,
+    onStartCooking: (Long) -> Unit,
+    onToggleFavorite: (RecipeEntity) -> Unit,
+    onDeleteRecipe: (RecipeEntity) -> Unit
+) {
     if (recipe == null) {
-        // La receta no existe o acaba de ser eliminada
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Receta no encontrada.")
         }
@@ -41,6 +85,7 @@ fun RecipeDetailScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(recipe.name) },
@@ -53,36 +98,36 @@ fun RecipeDetailScreen(
                     }
                 },
                 actions = {
-                    // Botón de Favorito
-                    IconButton(onClick = {
-                        viewModel.updateRecipe(recipe.copy(isFavorite = !recipe.isFavorite))
-                    }) {
+                    IconButton(onClick = { onToggleFavorite(recipe) }) {
                         Icon(
-                            imageVector = if (recipe.isFavorite) Icons.Filled.Star else Icons.Filled.StarBorder,
-                            contentDescription = "Alternar favorito",
+                            imageVector = if (recipe.isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
+                            contentDescription = "Favorito",
                             tint = if (recipe.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                         )
                     }
-                    // Botón de Editar
                     IconButton(onClick = { onNavigateToEdit(recipe.id) }) {
-                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Editar")
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Editar receta")
                     }
-                    // Botón de Eliminar
-                    IconButton(onClick = {
-                        viewModel.deleteRecipe(recipe)
-                        onNavigateBack()
-                    }) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Eliminar")
+                    IconButton(onClick = { onDeleteRecipe(recipe) }) {
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Eliminar receta")
                     }
                 }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { onStartCooking(recipe.id) }) {
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Iniciar modo cocina"
-                )
+            FloatingActionButton(
+                onClick = { onStartCooking(recipe.id) },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Cocinar")
+                }
             }
         }
     ) { padding ->
@@ -93,68 +138,50 @@ fun RecipeDetailScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Sección de Tiempo de Preparación
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Tiempo de preparación: ",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium
+                        text = "Tiempo de preparación",
+                        style = MaterialTheme.typography.labelMedium
                     )
                     Text(
                         text = "${recipe.prepTimeMinutes} minutos",
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Sección de Ingredientes
             Text(
                 text = "Ingredientes",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Text(
-                    text = recipe.ingredients,
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+            Text(
+                text = recipe.ingredients,
+                style = MaterialTheme.typography.bodyMedium
+            )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Sección de Instrucciones
             Text(
                 text = "Instrucciones",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Text(
-                    text = recipe.instructions,
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+            Text(
+                text = recipe.instructions,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
