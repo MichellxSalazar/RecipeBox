@@ -6,6 +6,7 @@ import com.example.recipebox.data.local.dao.RecipeDao
 import com.example.recipebox.data.local.dao.CategoryDao
 import com.example.recipebox.data.local.dao.IngredientDao
 import com.example.recipebox.repository.RecipeRepository
+import com.example.recipebox.repository.RecipeRepositoryImpl
 import com.example.recipebox.repository.CategoryRepository
 import com.example.recipebox.repository.CategoryRepositoryImpl
 import com.example.recipebox.repository.IngredientRepository
@@ -55,7 +56,7 @@ object AppModule {
     fun provideRecipeRepository(
         recipeDao: RecipeDao
     ): RecipeRepository {
-        return RecipeRepository(recipeDao)
+        return RecipeRepositoryImpl(recipeDao)
     }
 
     @Provides
