@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.recipebox.ui.inicio.screens.HomeScreen
+import com.example.recipebox.ui.inicio.screens.WelcomeScreen
 import com.example.recipebox.ui.inicio.viewmodels.HomeViewModel
 import com.example.recipebox.ui.recetas.screens.AddRecipeScreen
 import com.example.recipebox.ui.recetas.screens.EditRecipeScreen
@@ -26,7 +27,16 @@ import com.example.recipebox.ui.modococina.viewmodels.RecipeDetailViewModel
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "home") {
+    NavHost(navController = navController, startDestination = "welcome") {
+        composable("welcome") {
+            WelcomeScreen(
+                onStartClick = {
+                    navController.navigate("home") {
+                        popUpTo("welcome") { inclusive = true }
+                    }
+                }
+            )
+        }
         composable("home") {
             val viewModel = hiltViewModel<HomeViewModel>()
             HomeScreen(
