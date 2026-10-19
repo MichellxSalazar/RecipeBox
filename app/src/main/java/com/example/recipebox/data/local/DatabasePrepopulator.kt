@@ -39,7 +39,6 @@ object DatabasePrepopulator {
 
     val defaultRecipes = listOf(
         RecipeEntity(
-            id = 1L,
             name = "Pancakes Clásicos Americanos",
             categoryId = 1L,
             ingredients = "200 g de Harina de trigo, 2 unidades de Huevos, 250 ml de Leche entera, 30 g de Mantequilla, 30 g de Azúcar",
@@ -48,7 +47,6 @@ object DatabasePrepopulator {
             isFavorite = true
         ),
         RecipeEntity(
-            id = 2L,
             name = "Pasta Carbonara Tradicional",
             categoryId = 2L,
             ingredients = "400 g de Pasta Spaghetti, 150 g de Tocineta / Guanciale, 4 unidades de Huevos, 100 g de Queso Parmesano, 5 g de Sal y Pimienta",
@@ -57,7 +55,6 @@ object DatabasePrepopulator {
             isFavorite = true
         ),
         RecipeEntity(
-            id = 3L,
             name = "Ensalada César con Pollo",
             categoryId = 3L,
             ingredients = "250 g de Pechuga de pollo, 150 g de Lechuga romana, 50 g de Queso Parmesano, 20 ml de Aceite de oliva, 5 g de Sal y Pimienta",
@@ -66,7 +63,6 @@ object DatabasePrepopulator {
             isFavorite = false
         ),
         RecipeEntity(
-            id = 4L,
             name = "Tiramisú Casero",
             categoryId = 4L,
             ingredients = "250 g de Queso Mascarpone, 3 unidades de Huevos, 100 g de Azúcar, 200 ml de Café expreso, 100 g de Harina de trigo",
@@ -75,7 +71,6 @@ object DatabasePrepopulator {
             isFavorite = true
         ),
         RecipeEntity(
-            id = 5L,
             name = "Arroz con Pollo Casero",
             categoryId = 2L,
             ingredients = "300 g de Arroz blanco, 350 g de Pechuga de pollo, 20 ml de Aceite de oliva, 5 g de Sal y Pimienta, 2 unidades de Huevos",
@@ -90,14 +85,17 @@ object DatabasePrepopulator {
         categoryDao: CategoryDao,
         ingredientDao: IngredientDao
     ) = withContext(Dispatchers.IO) {
-        if (categoryDao.getCategoryCount() == 0) {
-            categoryDao.insertCategories(defaultCategories)
-        }
-        if (ingredientDao.getIngredientCount() == 0) {
-            ingredientDao.insertIngredients(defaultIngredients)
-        }
-        if (recipeDao.getRecipeCount() == 0) {
-            recipeDao.insertRecipes(defaultRecipes)
+        // Asegurar que las categorías base existan
+        categoryDao.insertCategories(defaultCategories)
+
+        // Asegurar que los ingredientes base existan
+        ingredientDao.insertIngredients(defaultIngredients)
+
+        // Insertar cada receta predeterminada si no existe ya por nombre
+        for (recipe in defaultRecipes) {
+            if (recipeDao.getRecipeByName(recipe.name) == null) {
+                recipeDao.insertRecipe(recipe)
+            }
         }
     }
 }
