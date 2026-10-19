@@ -1,5 +1,6 @@
 package com.example.recipebox.ui.inicio.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,12 +19,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.recipebox.R
 import com.example.recipebox.data.local.entity.CategoryEntity
 import com.example.recipebox.data.local.entity.RecipeEntity
 import com.example.recipebox.ui.inicio.components.RecipeCard
@@ -123,10 +127,20 @@ private fun HomeContent(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "RecipeBox",
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.app_logo),
+                            contentDescription = "Logo",
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "RecipeBox",
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 },
                 actions = {
                     IconButton(onClick = onOrganizerClick) {

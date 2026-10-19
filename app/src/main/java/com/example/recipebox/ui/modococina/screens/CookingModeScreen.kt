@@ -12,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,10 +59,6 @@ fun CookingModeScreen(
         KeepScreenOn()
     }
 
-    val purplePrimary = Color(0xFF6750A4)
-    val purpleContainer = Color(0xFFEADDFF)
-    val onPurpleContainer = Color(0xFF21005D)
-
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -95,16 +90,16 @@ fun CookingModeScreen(
             val totalSteps = uiState.steps.size
             val currentStep = uiState.currentStepIndex
 
-            // Chip Lila de progreso
+            // Chip cálido de progreso
             Surface(
                 shape = RoundedCornerShape(20.dp),
-                color = purpleContainer,
+                color = MaterialTheme.colorScheme.primaryContainer,
                 modifier = Modifier.padding(top = 8.dp)
             ) {
                 Text(
                     text = "Paso ${currentStep + 1} de $totalSteps",
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                    color = onPurpleContainer,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
                 )
             }
@@ -164,8 +159,8 @@ fun CookingModeScreen(
                             .height(52.dp),
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = purplePrimary,
-                            contentColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Text("Siguiente", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
@@ -178,8 +173,8 @@ fun CookingModeScreen(
                             .height(52.dp),
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = purplePrimary,
-                            contentColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Text("Finalizar", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
@@ -202,40 +197,16 @@ fun KeepScreenOn() {
     }
 }
 
-@Preview(name = "Modo Claro", showBackground = true)
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun CookingModeScreenPreview() {
-    RecipeBoxTheme(darkTheme = false) {
+    RecipeBoxTheme {
         CookingModeScreen(
             uiState = RecipeDetailUiState(
-                isLoading = false,
-                currentStepIndex = 1,
-                steps = listOf(
-                    "Paso 1: Poner a hervir abundante agua con sal en una olla grande.",
-                    "Paso 2: Dorar el guanciale picado en cubos en una sartén grande a fuego medio sin agregar aceite.",
-                    "Paso 3: Mezclar las yemas de huevo con el queso pecorino hasta formar una crema homogénea."
-                )
-            ),
-            onNextStep = {},
-            onPreviousStep = {},
-            onFinishCooking = {}
-        )
-    }
-}
-
-@Preview(name = "Modo Oscuro", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Composable
-fun CookingModeScreenDarkPreview() {
-    RecipeBoxTheme(darkTheme = true) {
-        CookingModeScreen(
-            uiState = RecipeDetailUiState(
-                isLoading = false,
-                currentStepIndex = 1,
-                steps = listOf(
-                    "Paso 1: Poner a hervir abundante agua con sal en una olla grande.",
-                    "Paso 2: Dorar el guanciale picado en cubos en una sartén grande a fuego medio sin agregar aceite.",
-                    "Paso 3: Mezclar las yemas de huevo con el queso pecorino hasta formar una crema homogénea."
-                )
+                title = "Pasta Carbonara",
+                steps = listOf("Paso 1: Hervir agua con sal.", "Paso 2: Cocinar la pasta al dente."),
+                currentStepIndex = 0
             ),
             onNextStep = {},
             onPreviousStep = {},

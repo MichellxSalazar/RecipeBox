@@ -1,6 +1,5 @@
 package com.example.recipebox.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,35 +8,57 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = DarkPrimary,
+    onPrimary = DarkOnPrimary,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = DarkOnPrimaryContainer,
+    secondary = DarkSecondary,
+    onSecondary = DarkOnSecondary,
+    secondaryContainer = DarkSecondaryContainer,
+    onSecondaryContainer = DarkOnSecondaryContainer,
+    tertiary = Terracotta,
+    onTertiary = Color.White,
+    background = DarkBackground,
+    onBackground = DarkOnBackground,
+    surface = DarkSurface,
+    onSurface = DarkOnSurface,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = DarkOnSurfaceVariant,
+    outline = DarkOutline
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = WarmOrange,
     onPrimary = Color.White,
+    primaryContainer = WarmOrangeContainer,
+    onPrimaryContainer = OnWarmOrangeContainer,
+    secondary = SageGreen,
     onSecondary = Color.White,
+    secondaryContainer = SageGreenContainer,
+    onSecondaryContainer = OnSageGreenContainer,
+    tertiary = Terracotta,
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    tertiaryContainer = TerracottaContainer,
+    onTertiaryContainer = OnTerracottaContainer,
+    background = WarmCream,
+    onBackground = CoffeeDarkBrown,
+    surface = WarmSurface,
+    onSurface = CoffeeDarkBrown,
+    surfaceVariant = WarmSurfaceVariant,
+    onSurfaceVariant = CoffeeMediumBrown,
+    outline = WarmOutline,
+    outlineVariant = WarmOutlineVariant
 )
 
 @Composable
 fun RecipeBoxTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    // Por defecto false para garantizar la identidad visual de RecipeBox
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -45,7 +66,6 @@ fun RecipeBoxTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
