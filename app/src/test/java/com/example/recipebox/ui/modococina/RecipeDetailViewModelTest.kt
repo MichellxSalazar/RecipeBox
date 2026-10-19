@@ -1,8 +1,13 @@
 package com.example.recipebox.ui.modococina
 
+import com.example.recipebox.data.local.entity.CategoryEntity
+import com.example.recipebox.data.local.entity.RecipeEntity
+import com.example.recipebox.repository.RecipeRepository
 import com.example.recipebox.ui.modococina.viewmodels.RecipeDetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -18,10 +23,22 @@ class RecipeDetailViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var viewModel: RecipeDetailViewModel
 
+    // Repositorio fake para pruebas unitarias
+    private class FakeRecipeRepository : RecipeRepository {
+        override fun getAllRecipes(): Flow<List<RecipeEntity>> = emptyFlow()
+        override fun getRecipesByCategory(categoryId: Long): Flow<List<RecipeEntity>> = emptyFlow()
+        override suspend fun getRecipeById(id: Long): RecipeEntity? = null
+        override suspend fun insertRecipe(recipe: RecipeEntity) {}
+        override suspend fun updateRecipe(recipe: RecipeEntity) {}
+        override suspend fun deleteRecipe(recipe: RecipeEntity) {}
+        override suspend fun getCategoryCount(): Int = 0
+        override suspend fun insertCategories(categories: List<CategoryEntity>) {}
+    }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = RecipeDetailViewModel()
+        viewModel = RecipeDetailViewModel(FakeRecipeRepository())
     }
 
     @After
